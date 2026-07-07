@@ -5,7 +5,18 @@ const screens = [...document.querySelectorAll('.screen')];
 const form = document.querySelector('#quest-form');
 const sessionForm = document.querySelector('#session-form');
 const taskInput = document.querySelector('#task');
-const rewards = ['Neuer Dirt-Helm', 'Flammen-Sticker', 'Orange Griffe', 'Neue Track-Rampe', 'Türkise Pedale'];
+const rewardCatalog = [
+  { name: 'Neuer Dirt-Helm', symbol: 'H' },
+  { name: 'Flammen-Sticker', symbol: '⚡' },
+  { name: 'Orange Griffe', symbol: '║' },
+  { name: 'Neue Track-Rampe', symbol: '▲' },
+  { name: 'Türkise Pedale', symbol: '✦' },
+  { name: 'Dirt-Rahmen', symbol: '◇' },
+  { name: 'All-Terrain-Reifen', symbol: '◎' },
+  { name: 'Race-Sattel', symbol: '◆' },
+  { name: 'Goldene Kette', symbol: '●' },
+  { name: 'Pro-Nummernschild', symbol: '★' }
+];
 
 let state = {
   schemaVersion: STATE_VERSION,
@@ -17,10 +28,11 @@ let state = {
   currentSession: null,
   sessions: [],
   lastCompletedSessionId: null,
-  currentReward: rewards[0]
+  currentReward: rewardCatalog[0].name
 };
 let timerId;
 let screenBeforeHistory = 'entry';
+let screenBeforeGarage = 'entry';
 
 function loadState() {
   try {
@@ -209,6 +221,18 @@ function fillQuest() {
   document.querySelector('#active-scope').textContent = scope || 'Dein heutiger Run';
   document.querySelector('#confirm-title').textContent = task;
   document.querySelector('#reward-name').textContent = state.currentReward;
+  document.querySelector('#reward-symbol').textContent = getRewardMeta(state.currentReward).symbol;
+}
+
+function getRewardMeta(rewardName) {
+  return rewardCatalog.find((reward) => reward.name === rewardName) || { name: rewardName, symbol: '★' };
+}
+
+function chooseUniqueReward() {
+  const earnedRewards = new Set(state.completedQuests.map((quest) => quest.reward).filter(Boolean));
+  const availableRewards = rewardCatalog.filter((reward) => !earnedRewards.has(reward.name));
+  if (availableRewards.length) return availableRewards[Math.floor(Math.random() * availableRewards.length)].name;
+  return `Dirt-Abzeichen ${earnedRewards.size - rewardCatalog.length + 1}`;
 }
 
 function updateProgress() {
@@ -257,9 +281,36 @@ function renderSessionComplete() {
       <span>${index + 1}</span>
       <div><span>${escapeHtml(run.subject.toUpperCase())}</span><strong>${escapeHtml(run.task)}</strong></div>
       <time>${formatTime(run.elapsedSeconds)}</time>
+      <span class="session-finish-reward">${escapeHtml(getRewardMeta(run.reward).symbol)} ${escapeHtml(run.reward)}</span>
     </article>
   `).join('');
   return true;
+}
+
+function renderGarage() {
+  const collected = new Map();
+  state.completedQuests.forEach((quest) => {
+    if (quest.reward) collected.set(quest.reward, quest);
+  });
+  const items = [...collected.values()].reverse();
+  document.querySelector('#garage-count').textContent = items.length;
+  const list = document.querySelector('#garage-list');
+
+  if (!items.length) {
+    list.innerHTML = '<div class="garage-empty">Noch ist die Garage leer. Der erste Gegenstand wartet hinter deiner nächsten Ziellinie.</div>';
+    return;
+  }
+
+  list.innerHTML = items.map((item) => {
+    const reward = getRewardMeta(item.reward);
+    return `
+      <article class="garage-item">
+        <span class="garage-symbol" aria-hidden="true">${escapeHtml(reward.symbol)}</span>
+        <strong>${escapeHtml(item.reward)}</strong>
+        <time datetime="${item.completedAt}">${formatDate(item.completedAt)}</time>
+      </article>
+    `;
+  }).join('');
 }
 
 function renderHistory() {
@@ -362,7 +413,7 @@ document.addEventListener('click', (event) => {
     if (!session || session.status !== 'active' || session.runIds.length >= session.targetRuns) {
       updateProgress(); show(session ? 'session-complete' : 'planning'); return;
     }
-    state.currentReward = rewards[Math.floor(Math.random() * rewards.length)];
+    state.currentReward = chooseUniqueReward();
     const completedQuest = {
       id: `${Date.now()}`,
       ...state.quest,
@@ -410,6 +461,15 @@ document.addEventListener('click', (event) => {
     show(destination);
     if (destination === 'active') startTimer();
   }
+  if (action === 'garage') {
+    screenBeforeGarage = state.currentScreen === 'garage' ? 'planning' : state.currentScreen;
+    pauseTimer(); renderGarage(); show('garage', false);
+  }
+  if (action === 'garage-back') {
+    const destination = screenBeforeGarage || 'planning';
+    show(destination);
+    if (destination === 'active') startTimer();
+  }
   if (action === 'home') {
     if (state.currentScreen === 'active') pauseTimer();
     if (state.currentScreen === 'session-complete' && renderSessionComplete()) { show('session-complete'); return; }
@@ -425,6 +485,7 @@ restoreForm();
 updateProgress();
 renderTimer();
 renderHistory();
+renderGarage();
 renderPlanningSelection();
 
 const restorableScreens = ['planning', 'entry', 'proposal', 'active', 'confirm', 'success', 'session-complete'];
