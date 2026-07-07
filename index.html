@@ -37,23 +37,40 @@
           <span class="ramp ramp-one"></span>
           <span class="ramp ramp-two"></span>
         </div>
+        <div class="finish-gate" aria-hidden="true">
+          <span class="finish-post finish-post-left"></span>
+          <span class="finish-banner">FINISH</span>
+          <span class="finish-post finish-post-right"></span>
+        </div>
+        <div class="track-celebration" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
         <div class="rider" id="rider">
           <svg viewBox="0 0 120 78" role="presentation">
-            <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <g fill="none" stroke-linecap="round" stroke-linejoin="round">
               <g class="wheel wheel-back">
-                <circle cx="27" cy="55" r="17" stroke-width="6" />
-                <path d="M27 38v34M10 55h34M15 43l24 24M15 67l24-24" stroke-width="2" />
+                <circle class="tire" cx="27" cy="55" r="17" stroke-width="6" />
+                <path class="spokes" d="M27 38v34M10 55h34M15 43l24 24M15 67l24-24" stroke-width="2" />
+                <circle class="hub" cx="27" cy="55" r="3" />
               </g>
               <g class="wheel wheel-front">
-                <circle cx="92" cy="55" r="17" stroke-width="6" />
-                <path d="M92 38v34M75 55h34M80 43l24 24M80 67l24-24" stroke-width="2" />
+                <circle class="tire" cx="92" cy="55" r="17" stroke-width="6" />
+                <path class="spokes" d="M92 38v34M75 55h34M80 43l24 24M80 67l24-24" stroke-width="2" />
+                <circle class="hub" cx="92" cy="55" r="3" />
               </g>
-              <path d="M27 55 47 28l19 27H27Zm20-27h25l20 27M66 55l13-35M71 20h16M42 24h12" stroke-width="6" />
-              <circle cx="66" cy="10" r="8" fill="currentColor" stroke-width="3" />
-              <path d="m63 19-11 20m13-18 17 10m-30 8 14 16" stroke-width="7" />
+              <path class="bike-frame" d="M27 55 47 29l19 26H27Zm20-26h25l20 26M66 55l12-34" stroke-width="6" />
+              <path class="bike-metal" d="M71 21h17M42 25h13" stroke-width="5" />
+              <path class="rider-leg-back" d="M54 35 66 54" stroke-width="8" />
+              <path class="rider-body" d="M64 20 54 36" stroke-width="10" />
+              <path class="rider-arm" d="M64 23 81 31" stroke-width="7" />
+              <circle class="rider-head" cx="67" cy="10" r="8" stroke-width="3" />
+              <path class="helmet" d="M59 9c1-8 13-10 17-2l-7 1-2 5z" stroke-width="3" />
+              <path class="rider-leg-front" d="M55 36 44 51" stroke-width="8" />
+              <path class="shoe" d="M40 53h9" stroke-width="5" />
             </g>
           </svg>
         </div>
+        <div class="landing-dust" aria-hidden="true"><i></i><i></i><i></i></div>
         <i class="dust dust-one"></i><i class="dust dust-two"></i>
         <span class="checkpoint start">START</span>
         <span class="checkpoint finish">FINISH</span>
@@ -159,11 +176,11 @@
       <section class="screen" data-screen="success">
         <p class="eyebrow">RUN COMPLETE</p>
         <h1>Sauber gelandet!</h1>
-        <p class="intro">Du bist auf dem Track einen Schritt weiter.</p>
+        <p class="intro">Starke Landung. Du bist auf dem Track einen Schritt weiter.</p>
         <div class="reward-box">
           <span class="burst">NEU</span>
           <div class="reward-icon">
-            <span id="reward-symbol" aria-hidden="true">◆</span>
+            <span id="reward-symbol" aria-hidden="true"></span>
           </div>
           <p>ÜBERRASCHUNG FREIGESCHALTET</p>
           <strong id="reward-name">Neuer Dirt-Helm</strong>
@@ -174,8 +191,9 @@
 
       <section class="screen" data-screen="session-complete">
         <p class="eyebrow">RUNDE GESCHAFFT</p>
-        <h1>Track komplett!</h1>
-        <p class="intro">Ihr habt euer vereinbartes Ziel erreicht. Hier ist eure Runde im Überblick.</p>
+        <h1>Über die Ziellinie!</h1>
+        <p class="intro">Alle Runs geschafft. Ihr habt euer vereinbartes Ziel gemeinsam erreicht.</p>
+        <div class="finish-stamp" aria-hidden="true"><span>🏁</span><strong>TRACK<br />COMPLETE</strong></div>
         <div class="session-finish-stats">
           <div><strong id="session-finish-count">0 / 0</strong><span>Runs geschafft</span></div>
           <div><strong id="session-finish-time">00:00</strong><span>Gesamtzeit</span></div>

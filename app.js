@@ -6,17 +6,33 @@ const form = document.querySelector('#quest-form');
 const sessionForm = document.querySelector('#session-form');
 const taskInput = document.querySelector('#task');
 const rewardCatalog = [
-  { name: 'Neuer Dirt-Helm', symbol: 'H' },
-  { name: 'Flammen-Sticker', symbol: '⚡' },
-  { name: 'Orange Griffe', symbol: '║' },
-  { name: 'Neue Track-Rampe', symbol: '▲' },
-  { name: 'Türkise Pedale', symbol: '✦' },
-  { name: 'Dirt-Rahmen', symbol: '◇' },
-  { name: 'All-Terrain-Reifen', symbol: '◎' },
-  { name: 'Race-Sattel', symbol: '◆' },
-  { name: 'Goldene Kette', symbol: '●' },
-  { name: 'Pro-Nummernschild', symbol: '★' }
+  { name: 'Neuer Dirt-Helm', icon: 'helmet' },
+  { name: 'Flammen-Sticker', icon: 'flame' },
+  { name: 'Orange Griffe', icon: 'grips' },
+  { name: 'Neue Track-Rampe', icon: 'ramp' },
+  { name: 'Fancy Pedale', icon: 'pedals' },
+  { name: 'Dirt-Rahmen', icon: 'frame' },
+  { name: 'All-Terrain-Reifen', icon: 'tire' },
+  { name: 'Race-Sattel', icon: 'saddle' },
+  { name: 'Goldene Kette', icon: 'chain' },
+  { name: 'Pro-Nummernschild', icon: 'plate' }
 ];
+
+const rewardIcons = {
+  helmet: '<path class="icon-main" d="M10 36c0-17 9-27 24-27 12 0 20 7 22 18l-15 3-8 13H16z"/><path class="icon-accent" d="m34 11 5 18 16-3C52 16 45 11 34 11Z"/><path class="icon-line" d="M15 37h18l8-7m-24 14h12"/>',
+  flame: '<path class="icon-main" d="M34 5c4 13-8 16-2 25 3-6 9-9 11-16 10 12 14 23 8 34-8 15-31 15-39 0-7-14 2-26 12-35-1 10 2 14 5 17 4-9 0-16 5-25Z"/><path class="icon-accent" d="M32 34c7 7 8 12 5 17-3 6-12 6-15 0-3-6 2-11 10-17Z"/>',
+  grips: '<path class="icon-line" d="M12 22h13l7 12 7-12h13M32 34v19"/><path class="icon-main" d="M5 17h13v11H5zm41 0h13v11H46z"/><circle class="icon-accent" cx="32" cy="36" r="5"/>',
+  ramp: '<path class="icon-main" d="M7 51h50L50 17 17 42Z"/><path class="icon-accent" d="M17 42 50 17l3 10-29 23Z"/><path class="icon-line" d="M8 52h49M18 42l8 10m9-24 11 24"/>',
+  pedals: '<circle class="icon-line" cx="32" cy="32" r="9"/><path class="icon-line" d="m26 26-9-9m21 21 9 9"/><rect class="icon-main" x="7" y="11" width="17" height="8" rx="3"/><rect class="icon-main" x="40" y="45" width="17" height="8" rx="3"/><circle class="icon-accent" cx="32" cy="32" r="4"/>',
+  frame: '<circle class="icon-line" cx="14" cy="45" r="10"/><circle class="icon-line" cx="50" cy="45" r="10"/><path class="icon-main icon-stroke" d="m14 45 13-22 11 22H14Zm13-22h13l10 22M38 45l7-28"/><path class="icon-line" d="M41 17h10M23 20h9"/>',
+  tire: '<circle class="icon-main icon-stroke" cx="32" cy="32" r="24"/><circle class="icon-line" cx="32" cy="32" r="15"/><path class="icon-line" d="M32 17v30M17 32h30M21 21l22 22m0-22L21 43"/><circle class="icon-accent" cx="32" cy="32" r="4"/>',
+  saddle: '<path class="icon-main" d="M8 22c12-5 26-6 45-1 5 1 6 8 1 11-11 6-27 8-43 3-7-2-8-10-3-13Z"/><path class="icon-line" d="m31 36-3 17m2-8h12"/><path class="icon-accent" d="M12 23c12-3 25-3 38 0-13 2-26 3-38 0Z"/>',
+  chain: '<circle class="icon-main icon-stroke" cx="25" cy="33" r="16"/><circle class="icon-line" cx="25" cy="33" r="7"/><circle class="icon-accent icon-stroke" cx="49" cy="33" r="7"/><path class="icon-line" d="M25 17h24M25 49h24"/><path class="icon-line" d="m25 13 2 7m12-5-4 7m-18-4 6 5m-14 5 8 1M9 39l8-2m0 11 6-6"/>',
+  plate: '<path class="icon-main" d="M13 10h38l5 9-5 35H13L8 19Z"/><path class="icon-accent" d="M16 16h32l2 7H14Z"/><path class="icon-line" d="M20 10 16 4m28 6 4-6"/><path class="icon-number" d="M29 28h8v19h-6V34h-5Z"/>',
+  badge: '<circle class="icon-main icon-stroke" cx="32" cy="28" r="21"/><path class="icon-accent" d="m32 15 4 9 10 1-8 7 3 10-9-5-9 5 3-10-8-7 10-1Z"/><path class="icon-line" d="m20 46-3 14 15-8 15 8-3-14"/>'
+};
+
+const rewardRenames = { 'Türkise Pedale': 'Fancy Pedale' };
 
 let state = {
   schemaVersion: STATE_VERSION,
@@ -51,7 +67,12 @@ function loadState() {
 }
 
 function migrateState(saved) {
-  const completedQuests = Array.isArray(saved.completedQuests) ? saved.completedQuests : [];
+  const completedQuests = Array.isArray(saved.completedQuests)
+    ? saved.completedQuests.map((quest) => ({
+        ...quest,
+        reward: rewardRenames[quest.reward] || quest.reward
+      }))
+    : [];
   const sessions = Array.isArray(saved.sessions) ? saved.sessions : [];
 
   if (saved.schemaVersion === STATE_VERSION) {
@@ -71,7 +92,8 @@ function migrateState(saved) {
       completedQuests,
       currentSession,
       sessions,
-      lastCompletedSessionId: saved.lastCompletedSessionId || null
+      lastCompletedSessionId: saved.lastCompletedSessionId || null,
+      currentReward: rewardRenames[saved.currentReward] || saved.currentReward || state.currentReward
     };
   }
 
@@ -168,6 +190,10 @@ function saveState() {
 function show(name, save = true) {
   state.currentScreen = name;
   screens.forEach((screen) => screen.classList.toggle('active', screen.dataset.screen === name));
+  const track = document.querySelector('.track');
+  track.classList.remove('show-landing', 'show-finish');
+  if (name === 'success') track.classList.add('show-landing');
+  if (name === 'session-complete') track.classList.add('show-finish');
   if (save && name !== 'history') saveState();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -203,12 +229,12 @@ function pauseTimer() {
   saveState();
 }
 
-function animateRiderJump() {
+function animateRiderJump(isFinalRun = false) {
   const rider = document.querySelector('#rider');
-  rider.classList.remove('is-jumping');
+  rider.classList.remove('is-jumping', 'is-finishing');
   void rider.offsetWidth;
-  rider.classList.add('is-jumping');
-  window.setTimeout(() => rider.classList.remove('is-jumping'), 900);
+  rider.classList.add(isFinalRun ? 'is-finishing' : 'is-jumping');
+  window.setTimeout(() => rider.classList.remove('is-jumping', 'is-finishing'), isFinalRun ? 1500 : 1100);
 }
 
 function fillQuest() {
@@ -221,11 +247,23 @@ function fillQuest() {
   document.querySelector('#active-scope').textContent = scope || 'Dein heutiger Run';
   document.querySelector('#confirm-title').textContent = task;
   document.querySelector('#reward-name').textContent = state.currentReward;
-  document.querySelector('#reward-symbol').textContent = getRewardMeta(state.currentReward).symbol;
+  document.querySelector('#reward-symbol').innerHTML = getRewardIcon(state.currentReward);
 }
 
 function getRewardMeta(rewardName) {
-  return rewardCatalog.find((reward) => reward.name === rewardName) || { name: rewardName, symbol: '★' };
+  return rewardCatalog.find((reward) => reward.name === rewardName) || { name: rewardName, icon: 'badge' };
+}
+
+function getRewardIcon(rewardName, compact = false) {
+  const iconName = getRewardMeta(rewardName).icon;
+  const icon = rewardIcons[iconName] || rewardIcons.badge;
+  const sticker = compact ? '' : `
+    <path class="icon-sticker-shadow" d="M7 15 18 5l13 3L43 3l13 9-1 14 6 12-9 11-13 1-11 9-13-7-11-12 5-12Z"/>
+    <path class="icon-sticker" d="M5 12 18 3l13 4L44 2l12 9-2 14 7 11-8 12-14 1-10 10-14-8L3 40l5-13Z"/>
+    <path class="icon-scuff" d="m12 18 7-4M47 42l6-4M12 44l5 3"/>
+  `;
+  const art = compact ? icon : `<g class="icon-art" transform="translate(8 8) scale(.75)">${icon}</g>`;
+  return `<svg class="reward-svg reward-svg-${iconName}${compact ? ' reward-svg-compact' : ''}" viewBox="0 0 64 64" aria-hidden="true">${sticker}${art}</svg>`;
 }
 
 function chooseUniqueReward() {
@@ -281,7 +319,7 @@ function renderSessionComplete() {
       <span>${index + 1}</span>
       <div><span>${escapeHtml(run.subject.toUpperCase())}</span><strong>${escapeHtml(run.task)}</strong></div>
       <time>${formatTime(run.elapsedSeconds)}</time>
-      <span class="session-finish-reward">${escapeHtml(getRewardMeta(run.reward).symbol)} ${escapeHtml(run.reward)}</span>
+      <span class="session-finish-reward">${getRewardIcon(run.reward, true)} ${escapeHtml(run.reward)}</span>
     </article>
   `).join('');
   return true;
@@ -305,7 +343,7 @@ function renderGarage() {
     const reward = getRewardMeta(item.reward);
     return `
       <article class="garage-item">
-        <span class="garage-symbol" aria-hidden="true">${escapeHtml(reward.symbol)}</span>
+        <span class="garage-symbol" aria-hidden="true">${getRewardIcon(item.reward)}</span>
         <strong>${escapeHtml(item.reward)}</strong>
         <time datetime="${item.completedAt}">${formatDate(item.completedAt)}</time>
       </article>
@@ -433,7 +471,7 @@ document.addEventListener('click', (event) => {
       state.sessions = [...state.sessions.filter((item) => item.id !== session.id), { ...session }];
       state.currentSession = null;
       saveState();
-      renderSessionComplete(); show('session-complete'); updateProgress(); animateRiderJump();
+      renderSessionComplete(); show('session-complete'); updateProgress(); animateRiderJump(true);
     } else {
       fillQuest(); updateProgress(); animateRiderJump(); saveState(); show('success');
     }
