@@ -24,14 +24,21 @@ button,input,select,textarea { font:inherit; }
 .hills { position:absolute; left:-8%; right:-8%; bottom:62px; height:57px; background:#76a86c; clip-path:polygon(0 80%,10% 42%,20% 72%,35% 20%,48% 68%,62% 34%,75% 75%,88% 22%,100% 70%,100% 100%,0 100%); opacity:.8; }
 .track-line { position:absolute; left:-2%; right:-2%; bottom:24px; height:57px; background:var(--dirt); clip-path:polygon(0 45%,13% 40%,20% 4%,28% 41%,45% 48%,53% 20%,60% 52%,76% 45%,82% 8%,91% 44%,100% 40%,100% 100%,0 100%); border-bottom:10px solid var(--dirt-dark); }
 .ramp { position:absolute; bottom:25px; width:31px; height:20px; background:#d88746; clip-path:polygon(0 100%,100% 0,100% 100%); }.ramp-one { left:33%; }.ramp-two { left:70%; transform:scaleX(-1); }
-.rider { position:absolute; left:1%; bottom:56px; z-index:5; width:78px; filter:drop-shadow(3px 5px 0 #ffffff80); transform:rotate(-6deg); transform-origin:center bottom; transition:left .7s cubic-bezier(.2,.8,.2,1); }
+.rider { position:absolute; left:1%; bottom:55px; z-index:5; width:84px; filter:drop-shadow(3px 5px 0 #ffffff80); transform:rotate(-6deg); transform-origin:center bottom; transition:left .7s cubic-bezier(.2,.8,.2,1); }
 .rider svg { display:block; width:100%; }
 .wheel { transform-box:view-box; }
 .wheel-back { transform-origin:27px 55px; }.wheel-front { transform-origin:92px 55px; }
 .tire { stroke:#17251f; }.spokes { stroke:#f8f1df; }.hub { fill:#ffb428; stroke:#17251f; stroke-width:2px; }
 .bike-frame { stroke:var(--orange); }.bike-metal { stroke:#17251f; }
-.rider-body { stroke:#1da9c6; }.rider-arm,.rider-leg-front,.rider-leg-back { stroke:#24332c; }
-.rider-head { fill:#d98b58; stroke:#17251f; }.helmet { fill:#ffb428; stroke:#17251f; }.shoe { stroke:#fff; }
+.rider-leg-front,.rider-leg-back { stroke:#24332c; }
+.race-shoe { fill:#fff; stroke:#17251f; }
+.jersey { fill:var(--orange); stroke:#17251f; }.jersey-panel { fill:var(--blue); }.jersey-stripe { fill:#ffcf3f; }
+.race-number { fill:#fff; stroke:#17251f; stroke-width:1.5px; }.race-number-mark { stroke:#17251f; }
+.rider-arm-front { stroke:var(--orange); }.rider-arm-back { stroke:#d9552d; }
+.glove { fill:#ffcf3f; stroke:#17251f; }
+.helmet-shell { fill:#ffcf3f; stroke:#17251f; }.helmet-visor { fill:var(--orange); stroke:#17251f; }
+.goggles { fill:#9eeaf2; stroke:#17251f; }.helmet-chin { fill:#ffcf3f; stroke:#17251f; }.helmet-vent { stroke:#17251f; }
+.number-plate { fill:#fff; stroke:var(--orange); }.number-plate-mark { stroke:#17251f; }
 .rider.is-riding svg { animation:rider-bob .5s ease-in-out infinite alternate; }
 .rider.is-riding .wheel { animation:wheel-spin .65s linear infinite; }
 .rider.is-jumping svg { animation:rider-jump 1.05s cubic-bezier(.2,.75,.3,1); }
@@ -174,6 +181,6 @@ textarea { resize:vertical; } input:focus,select:focus,textarea:focus { border-c
 .garage-item strong { font:800 18px/1.05 Barlow Condensed; text-transform:uppercase; }.garage-item time { color:var(--muted); font-size:10px; }
 .garage-empty { grid-column:1 / -1; padding:30px 18px; border:2px dashed #af8a5a; border-radius:9px; color:var(--muted); text-align:center; background:#fff5dd; }
 .button:disabled { opacity:.65; cursor:not-allowed; transform:none!important; }
-@media (min-width:700px) { .app-shell { padding-top:32px; }.button { width:auto; min-width:280px; }.track { height:210px; margin-inline:-34px; }.rider { width:96px; bottom:62px; }.track-line { height:67px; }.finish-gate { bottom:31px; right:3.5%; height:112px; }.finish-post { height:112px; } }
+@media (min-width:700px) { .app-shell { padding-top:32px; }.button { width:auto; min-width:280px; }.track { height:210px; margin-inline:-34px; }.rider { width:104px; bottom:61px; }.track-line { height:67px; }.finish-gate { bottom:31px; right:3.5%; height:112px; }.finish-post { height:112px; } }
 @media (max-width:360px) { .app-shell { padding-inline:15px; }.track { margin-inline:-15px; } h1 { font-size:36px; }.rider { width:65px; }.header-actions { gap:6px; }.utility-nav button { padding-inline:7px; }.stage-count small { display:none; } }
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; animation:none!important; transition:none!important; } }
