@@ -176,6 +176,7 @@ function startTimer(reset = false) {
   if (reset) state.elapsedSeconds = 0;
   renderTimer();
   window.clearInterval(timerId);
+  document.querySelector('#rider').classList.add('is-riding');
   timerId = window.setInterval(() => {
     state.elapsedSeconds += 1;
     renderTimer();
@@ -186,7 +187,16 @@ function startTimer(reset = false) {
 function pauseTimer() {
   window.clearInterval(timerId);
   timerId = undefined;
+  document.querySelector('#rider').classList.remove('is-riding');
   saveState();
+}
+
+function animateRiderJump() {
+  const rider = document.querySelector('#rider');
+  rider.classList.remove('is-jumping');
+  void rider.offsetWidth;
+  rider.classList.add('is-jumping');
+  window.setTimeout(() => rider.classList.remove('is-jumping'), 900);
 }
 
 function fillQuest() {
@@ -372,9 +382,9 @@ document.addEventListener('click', (event) => {
       state.sessions = [...state.sessions.filter((item) => item.id !== session.id), { ...session }];
       state.currentSession = null;
       saveState();
-      renderSessionComplete(); show('session-complete'); updateProgress();
+      renderSessionComplete(); show('session-complete'); updateProgress(); animateRiderJump();
     } else {
-      fillQuest(); updateProgress(); saveState(); show('success');
+      fillQuest(); updateProgress(); animateRiderJump(); saveState(); show('success');
     }
   }
   if (action === 'new') {
