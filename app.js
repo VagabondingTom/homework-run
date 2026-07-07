@@ -49,6 +49,7 @@ let state = {
 let timerId;
 let screenBeforeHistory = 'entry';
 let screenBeforeGarage = 'entry';
+let confirmLock = false;
 
 function loadState() {
   try {
@@ -356,27 +357,90 @@ function renderGarage() {
   }).join('');
 }
 
+function buildHistoryGroups(sourceState = state) {
+  const quests = Array.isArray(sourceState.completedQuests) ? sourceState.completedQuests : [];
+  const sessionMap = new Map();
+  (sourceState.sessions || []).forEach((session) => sessionMap.set(session.id, session));
+  if (sourceState.currentSession) sessionMap.set(sourceState.currentSession.id, sourceState.currentSession);
+
+  const usedQuestIds = new Set();
+  const groups = [...sessionMap.values()].map((session) => {
+    const runIdSet = new Set(session.runIds || []);
+    const motos = quests.filter((quest) => runIdSet.has(quest.id) || quest.sessionId === session.id);
+    motos.forEach((quest) => usedQuestIds.add(quest.id));
+    return { ...session, motos };
+  });
+
+  const orphanedMotos = quests.filter((quest) => !usedQuestIds.has(quest.id));
+  if (orphanedMotos.length) {
+    const legacyDates = orphanedMotos.map((moto) => moto.completedAt).filter(Boolean).sort();
+    groups.push({
+      id: 'unassigned-legacy',
+      targetRuns: orphanedMotos.length,
+      status: 'legacy',
+      startedAt: null,
+      completedAt: legacyDates[legacyDates.length - 1] || null,
+      motos: orphanedMotos
+    });
+  }
+
+  return groups.sort((a, b) => {
+    if (a.status === 'active' && b.status !== 'active') return -1;
+    if (b.status === 'active' && a.status !== 'active') return 1;
+    const dateA = new Date(a.completedAt || a.startedAt || 0).getTime();
+    const dateB = new Date(b.completedAt || b.startedAt || 0).getTime();
+    return dateB - dateA;
+  });
+}
+
+function renderHistoryMoto(item) {
+  return `
+    <article class="history-moto">
+      <span>${escapeHtml(item.subject.toUpperCase())}</span>
+      <strong>${escapeHtml(item.task)}</strong>
+      <time>${formatTime(item.elapsedSeconds)}</time>
+    </article>
+  `;
+}
+
 function renderHistory() {
-  const items = [...state.completedQuests].reverse();
+  const groups = buildHistoryGroups();
   const totalTime = state.completedQuests.reduce((sum, item) => sum + item.elapsedSeconds, 0);
-  document.querySelector('#history-count').textContent = items.length;
   document.querySelector('#history-total-time').textContent = formatTime(totalTime);
   const list = document.querySelector('#history-list');
 
-  if (!items.length) {
+  document.querySelector('#history-count').textContent = state.completedQuests.length;
+
+  if (!groups.length) {
     list.innerHTML = '<div class="history-empty">Noch kein Moto abgeschlossen. Deine erste Ziellinie wartet schon.</div>';
     return;
   }
 
-  list.innerHTML = items.map((item) => `
-    <article class="history-item">
-      <span class="history-subject">${escapeHtml(item.subject.toUpperCase())}</span>
-      <strong>${escapeHtml(item.task)}</strong>
-      <time datetime="${item.completedAt}">${formatDate(item.completedAt)}</time>
-      <span class="history-duration">${formatTime(item.elapsedSeconds)}</span>
-      ${item.reward ? `<span class="history-reward">Session-Gewinn: ${escapeHtml(item.reward)}</span>` : ''}
+  list.innerHTML = groups.map((group) => {
+    const totalSessionTime = group.motos.reduce((sum, moto) => sum + moto.elapsedSeconds, 0);
+    const rewards = [...new Set(group.motos.map((moto) => moto.reward).filter(Boolean))];
+    const statusLabel = group.status === 'active' ? 'SESSION LÄUFT' : group.status === 'legacy' ? 'FRÜHERE MOTOS' : 'SESSION DIALED';
+    const sessionDate = group.completedAt || group.startedAt;
+    const rewardMarkup = rewards.length === 1
+      ? `<div class="history-session-reward">${getRewardIcon(rewards[0], true)}<span><small>SESSION-GEWINN</small><strong>${escapeHtml(rewards[0])}</strong></span></div>`
+      : rewards.length > 1
+        ? `<div class="history-session-legacy-rewards"><small>GEWINNE AUS FRÜHERER VERSION</small><span>${rewards.map(escapeHtml).join(' · ')}</span></div>`
+        : '';
+
+    return `
+    <article class="history-session ${group.status === 'active' ? 'is-active' : ''}">
+      <header>
+        <div><span>${statusLabel}</span><strong>${group.motos.length} / ${group.targetRuns || group.motos.length} MOTOS</strong></div>
+        ${sessionDate ? `<time datetime="${sessionDate}">${formatDate(sessionDate)}</time>` : ''}
+      </header>
+      <div class="history-session-time"><span>ZEIT AUF DEM TRACK</span><strong>${formatTime(totalSessionTime)}</strong></div>
+      ${rewardMarkup}
+      <div class="history-moto-list">
+        ${group.motos.length ? group.motos.map(renderHistoryMoto).join('') : '<p>Noch kein Moto abgeschlossen.</p>'}
+      </div>
     </article>
-  `).join('');
+  `;
+  }).join('');
 }
 
 function escapeHtml(value) {
@@ -451,6 +515,14 @@ document.addEventListener('click', (event) => {
   if (action === 'back') { startTimer(); show('active'); }
   if (action === 'done') { pauseTimer(); show('confirm'); }
   if (action === 'confirm') {
+    if (confirmLock) return;
+    confirmLock = true;
+    const confirmButton = document.querySelector('[data-action="confirm"]');
+    confirmButton.disabled = true;
+    window.setTimeout(() => {
+      confirmLock = false;
+      confirmButton.disabled = false;
+    }, 700);
     pauseTimer();
     const session = state.currentSession;
     if (!session || session.status !== 'active' || session.runIds.length >= session.targetRuns) {

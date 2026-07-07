@@ -19,7 +19,7 @@ Die App besteht aus statischen Dateien. `index.html` kann direkt im Browser geö
 - neue Session erst nach Abschluss bewusst planen
 - Gegenstände ohne anfängliche Dopplungen freischalten
 - gesammelte Gegenstände dauerhaft in der persönlichen Garage anzeigen
-- Motoverlauf mit Laufzeit und Datum
+- nach Sessions gruppierter Motoverlauf mit Ziel, Laufzeit, Status und Gewinn
 - lokale Speicherung ohne Konto oder Cloud
 - responsive Darstellung für Smartphone und Tablet
 
