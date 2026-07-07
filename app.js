@@ -3,6 +3,7 @@ const STORAGE_KEY = 'homework-run-state-v2';
 const LEGACY_STORAGE_KEY = 'homework-run-state-v1';
 const screens = [...document.querySelectorAll('.screen')];
 const form = document.querySelector('#quest-form');
+const sessionForm = document.querySelector('#session-form');
 const taskInput = document.querySelector('#task');
 const rewards = ['Neuer Dirt-Helm', 'Flammen-Sticker', 'Orange Griffe', 'Neue Track-Rampe', 'Türkise Pedale'];
 
@@ -15,6 +16,7 @@ let state = {
   completedQuests: [],
   currentSession: null,
   sessions: [],
+  lastCompletedSessionId: null,
   currentReward: rewards[0]
 };
 let timerId;
@@ -41,14 +43,23 @@ function migrateState(saved) {
   const sessions = Array.isArray(saved.sessions) ? saved.sessions : [];
 
   if (saved.schemaVersion === STATE_VERSION) {
+    const currentSession = saved.currentSession ? {
+      ...saved.currentSession,
+      goalLocked: Boolean(
+        saved.currentSession.goalLocked ||
+        saved.currentSession.runIds?.length ||
+        ['active', 'confirm'].includes(saved.currentScreen)
+      )
+    } : null;
     return {
       ...state,
       ...saved,
       schemaVersion: STATE_VERSION,
       quest: { ...state.quest, ...(saved.quest || {}) },
       completedQuests,
-      currentSession: saved.currentSession || null,
-      sessions
+      currentSession,
+      sessions,
+      lastCompletedSessionId: saved.lastCompletedSessionId || null
     };
   }
 
@@ -60,7 +71,8 @@ function migrateState(saved) {
       quest: { ...state.quest, ...(saved.quest || {}) },
       completedQuests: [],
       currentSession: null,
-      sessions: []
+      sessions: [],
+      lastCompletedSessionId: null
     };
   }
 
@@ -78,6 +90,7 @@ function migrateState(saved) {
     quest: { ...state.quest, ...(saved.quest || {}) },
     completedQuests: migratedQuests,
     currentSession: null,
+    lastCompletedSessionId: legacySessionId,
     sessions: [{
       id: legacySessionId,
       targetRuns: Math.max(migratedQuests.length, Number(saved.progress) || 0, 1),
@@ -89,20 +102,16 @@ function migrateState(saved) {
   };
 }
 
-function createSession(targetRuns = 5) {
+function createSession(targetRuns) {
   return {
     id: `session-${Date.now()}-${Math.random().toString(16).slice(2)}`,
     targetRuns,
     status: 'active',
+    goalLocked: false,
     startedAt: new Date().toISOString(),
     completedAt: null,
     runIds: []
   };
-}
-
-function ensureCurrentSession() {
-  if (!state.currentSession) state.currentSession = createSession();
-  return state.currentSession;
 }
 
 function saveState() {
@@ -158,10 +167,56 @@ function fillQuest() {
 }
 
 function updateProgress() {
-  document.querySelector('#progress-number').textContent = state.progress;
-  document.querySelector('#progress-bar').style.width = `${state.progress * 20}%`;
-  document.querySelector('#rider').style.left = `${2 + state.progress * 15.2}%`;
-  document.querySelector('.progress').setAttribute('aria-label', `Fortschritt: ${state.progress} von 5 Runs`);
+  const completedSession = state.sessions.find((session) => session.id === state.lastCompletedSessionId);
+  const visibleSession = state.currentSession || (state.currentScreen === 'session-complete' ? completedSession : null);
+  const completedRuns = visibleSession?.runIds?.length || 0;
+  const targetRuns = visibleSession?.targetRuns || null;
+  const fraction = targetRuns ? Math.min(completedRuns / targetRuns, 1) : 0;
+
+  document.querySelector('#progress-number').textContent = completedRuns;
+  document.querySelector('#progress-target').textContent = targetRuns || '?';
+  document.querySelector('#progress-bar').style.width = `${fraction * 100}%`;
+  document.querySelector('#rider').style.left = `${2 + fraction * 76}%`;
+  document.querySelector('.progress').setAttribute(
+    'aria-label',
+    targetRuns ? `Fortschritt: ${completedRuns} von ${targetRuns} Runs` : 'Noch keine Runde geplant'
+  );
+  renderRoundContext();
+}
+
+function renderRoundContext() {
+  const session = state.currentSession;
+  if (!session) return;
+  const nextRun = Math.min(session.runIds.length + 1, session.targetRuns);
+  document.querySelector('#round-context-label').textContent = `RUN ${nextRun} VON ${session.targetRuns}`;
+  document.querySelector('#edit-target-button').hidden = session.goalLocked;
+}
+
+function renderPlanningSelection() {
+  const target = state.currentSession && !state.currentSession.goalLocked ? state.currentSession.targetRuns : null;
+  document.querySelectorAll('input[name="run-goal"]').forEach((input) => {
+    input.checked = Number(input.value) === target;
+  });
+}
+
+function renderSessionComplete() {
+  const session = state.sessions.find((item) => item.id === state.lastCompletedSessionId);
+  if (!session) return false;
+  const runs = session.runIds
+    .map((id) => state.completedQuests.find((quest) => quest.id === id))
+    .filter(Boolean);
+  const totalTime = runs.reduce((sum, run) => sum + run.elapsedSeconds, 0);
+
+  document.querySelector('#session-finish-count').textContent = `${runs.length} / ${session.targetRuns}`;
+  document.querySelector('#session-finish-time').textContent = formatTime(totalTime);
+  document.querySelector('#session-finish-list').innerHTML = runs.map((run, index) => `
+    <article class="session-finish-item">
+      <span>${index + 1}</span>
+      <div><span>${escapeHtml(run.subject.toUpperCase())}</span><strong>${escapeHtml(run.task)}</strong></div>
+      <time>${formatTime(run.elapsedSeconds)}</time>
+    </article>
+  `).join('');
+  return true;
 }
 
 function renderHistory() {
@@ -201,8 +256,27 @@ function restoreForm() {
   document.querySelector('#scope').value = state.quest.scope;
 }
 
+sessionForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const selectedGoal = document.querySelector('input[name="run-goal"]:checked');
+  document.querySelector('#goal-error').classList.toggle('visible', !selectedGoal);
+  if (!selectedGoal) return;
+
+  const targetRuns = Number(selectedGoal.value);
+  if (state.currentSession && !state.currentSession.goalLocked) {
+    state.currentSession.targetRuns = targetRuns;
+  } else {
+    state.currentSession = createSession(targetRuns);
+  }
+  state.progress = 0;
+  state.quest = { subject: 'Deutsch', task: '', scope: '' };
+  state.elapsedSeconds = 0;
+  restoreForm(); renderTimer(); updateProgress(); saveState(); show('entry');
+});
+
 form.addEventListener('submit', (event) => {
   event.preventDefault();
+  if (!state.currentSession) { renderPlanningSelection(); show('planning'); return; }
   const task = taskInput.value.trim();
   document.querySelector('#task-error').classList.toggle('visible', !task);
   if (!task) { taskInput.focus(); return; }
@@ -220,14 +294,24 @@ document.addEventListener('click', (event) => {
   if (!action) return;
 
   if (action === 'edit') show('entry');
-  if (action === 'start') { startTimer(true); show('active'); }
+  if (action === 'edit-target' && state.currentSession && !state.currentSession.goalLocked) {
+    renderPlanningSelection(); show('planning');
+  }
+  if (action === 'start') {
+    if (!state.currentSession) { renderPlanningSelection(); show('planning'); return; }
+    state.currentSession.goalLocked = true;
+    if (!state.currentSession.firstRunStartedAt) state.currentSession.firstRunStartedAt = new Date().toISOString();
+    startTimer(true); show('active');
+  }
   if (action === 'back') { startTimer(); show('active'); }
   if (action === 'done') { pauseTimer(); show('confirm'); }
   if (action === 'confirm') {
     pauseTimer();
-    state.progress = Math.min(5, state.progress + 1);
+    const session = state.currentSession;
+    if (!session || session.status !== 'active' || session.runIds.length >= session.targetRuns) {
+      updateProgress(); show(session ? 'session-complete' : 'planning'); return;
+    }
     state.currentReward = rewards[Math.floor(Math.random() * rewards.length)];
-    const session = ensureCurrentSession();
     const completedQuest = {
       id: `${Date.now()}`,
       ...state.quest,
@@ -238,13 +322,33 @@ document.addEventListener('click', (event) => {
     };
     state.completedQuests.push(completedQuest);
     session.runIds.push(completedQuest.id);
-    fillQuest(); updateProgress(); saveState(); show('success');
+    state.progress = session.runIds.length;
+
+    if (session.runIds.length >= session.targetRuns) {
+      session.status = 'completed';
+      session.completedAt = new Date().toISOString();
+      state.lastCompletedSessionId = session.id;
+      state.sessions = [...state.sessions.filter((item) => item.id !== session.id), { ...session }];
+      state.currentSession = null;
+      saveState();
+      renderSessionComplete(); show('session-complete'); updateProgress();
+    } else {
+      fillQuest(); updateProgress(); saveState(); show('success');
+    }
   }
   if (action === 'new') {
     pauseTimer();
     state.quest = { subject: 'Deutsch', task: '', scope: '' };
     state.elapsedSeconds = 0;
     renderTimer(); restoreForm(); saveState(); show('entry');
+  }
+  if (action === 'new-session') {
+    pauseTimer();
+    state.currentSession = null;
+    state.progress = 0;
+    state.quest = { subject: 'Deutsch', task: '', scope: '' };
+    state.elapsedSeconds = 0;
+    renderTimer(); restoreForm(); renderPlanningSelection(); saveState(); show('planning'); updateProgress();
   }
   if (action === 'history') {
     screenBeforeHistory = state.currentScreen === 'history' ? 'entry' : state.currentScreen;
@@ -257,6 +361,9 @@ document.addEventListener('click', (event) => {
   }
   if (action === 'home') {
     if (state.currentScreen === 'active') pauseTimer();
+    if (state.currentScreen === 'session-complete' && renderSessionComplete()) { show('session-complete'); return; }
+    if (state.currentScreen === 'success') { show('success'); return; }
+    if (!state.currentSession) { renderPlanningSelection(); show('planning'); return; }
     show(state.quest.task ? 'proposal' : 'entry');
   }
 });
@@ -267,8 +374,14 @@ restoreForm();
 updateProgress();
 renderTimer();
 renderHistory();
+renderPlanningSelection();
 
-const restorableScreens = ['entry', 'proposal', 'active', 'confirm', 'success'];
-const initialScreen = restorableScreens.includes(state.currentScreen) ? state.currentScreen : 'entry';
+const restorableScreens = ['planning', 'entry', 'proposal', 'active', 'confirm', 'success', 'session-complete'];
+let initialScreen = restorableScreens.includes(state.currentScreen) ? state.currentScreen : 'planning';
+if (!state.currentSession && initialScreen !== 'session-complete') initialScreen = 'planning';
+if (initialScreen === 'session-complete' && !renderSessionComplete()) initialScreen = 'planning';
+if (state.currentSession?.runIds.length >= state.currentSession?.targetRuns) initialScreen = 'planning';
+state.currentScreen = initialScreen;
+updateProgress();
 show(initialScreen, false);
 if (initialScreen === 'active') startTimer();
