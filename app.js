@@ -229,9 +229,7 @@ function renderRoundContext() {
 
 function renderPlanningSelection() {
   const target = state.currentSession && !state.currentSession.goalLocked ? state.currentSession.targetRuns : null;
-  document.querySelectorAll('input[name="run-goal"]').forEach((input) => {
-    input.checked = Number(input.value) === target;
-  });
+  document.querySelector('#run-goal').value = target || '';
 }
 
 function renderSessionComplete() {
@@ -293,11 +291,11 @@ function restoreForm() {
 
 sessionForm.addEventListener('submit', (event) => {
   event.preventDefault();
-  const selectedGoal = document.querySelector('input[name="run-goal"]:checked');
-  document.querySelector('#goal-error').classList.toggle('visible', !selectedGoal);
-  if (!selectedGoal) return;
-
-  const targetRuns = Number(selectedGoal.value);
+  const goalInput = document.querySelector('#run-goal');
+  const targetRuns = Number(goalInput.value);
+  const validGoal = Number.isInteger(targetRuns) && targetRuns >= 1;
+  document.querySelector('#goal-error').classList.toggle('visible', !validGoal);
+  if (!validGoal) { goalInput.focus(); return; }
   if (state.currentSession && !state.currentSession.goalLocked) {
     state.currentSession.targetRuns = targetRuns;
   } else {
@@ -329,6 +327,14 @@ document.addEventListener('click', (event) => {
   if (!action) return;
 
   if (action === 'edit') show('entry');
+  if (action === 'goal-decrease' || action === 'goal-increase') {
+    const goalInput = document.querySelector('#run-goal');
+    const currentValue = Number(goalInput.value);
+    goalInput.value = action === 'goal-increase'
+      ? (currentValue >= 1 ? currentValue + 1 : 1)
+      : (currentValue >= 1 ? Math.max(1, currentValue - 1) : 1);
+    document.querySelector('#goal-error').classList.remove('visible');
+  }
   if (action === 'edit-target' && state.currentSession && !state.currentSession.goalLocked) {
     renderPlanningSelection(); show('planning');
   }
