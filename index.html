@@ -56,13 +56,12 @@
         <form id="session-form">
           <fieldset class="run-goal-fieldset">
             <legend>Runs für diese Runde</legend>
-            <div class="run-goals">
-              <label><input type="radio" name="run-goal" value="1" required /><span>1</span></label>
-              <label><input type="radio" name="run-goal" value="2" /><span>2</span></label>
-              <label><input type="radio" name="run-goal" value="3" /><span>3</span></label>
-              <label><input type="radio" name="run-goal" value="4" /><span>4</span></label>
-              <label><input type="radio" name="run-goal" value="5" /><span>5</span></label>
+            <div class="run-goal-custom">
+              <button type="button" data-action="goal-decrease" aria-label="Einen Run weniger">−</button>
+              <input id="run-goal" name="run-goal" type="number" min="1" step="1" inputmode="numeric" placeholder="3" required aria-describedby="goal-hint goal-error" />
+              <button type="button" data-action="goal-increase" aria-label="Einen Run mehr">+</button>
             </div>
+            <small class="goal-hint" id="goal-hint">Mindestens 1 Run</small>
             <small class="error" id="goal-error">Bitte wählt zuerst ein Rundenziel.</small>
           </fieldset>
           <button class="button primary" type="submit">RUNDE PLANEN <span>→</span></button>
