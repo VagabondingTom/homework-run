@@ -25,6 +25,17 @@ button,input,select,textarea { font:inherit; }
 .ramp { position:absolute; bottom:25px; width:31px; height:20px; background:#d88746; clip-path:polygon(0 100%,100% 0,100% 100%); }.ramp-one { left:33%; }.ramp-two { left:70%; transform:scaleX(-1); }
 .rider { position:absolute; left:1%; bottom:56px; z-index:3; width:72px; color:var(--ink); filter:drop-shadow(3px 5px 0 #ffffff80); transform:rotate(-6deg); transform-origin:center bottom; transition:left .7s cubic-bezier(.2,.8,.2,1); }
 .rider svg { display:block; width:100%; }
+.wheel { transform-box:view-box; }
+.wheel-back { transform-origin:27px 55px; }.wheel-front { transform-origin:92px 55px; }
+.rider.is-riding svg { animation:rider-bob .5s ease-in-out infinite alternate; }
+.rider.is-riding .wheel { animation:wheel-spin .65s linear infinite; }
+.rider.is-jumping svg { animation:rider-jump .85s cubic-bezier(.2,.75,.3,1); }
+.rider.is-riding ~ .dust { animation:dust-puff .9s ease-out infinite; }
+.rider.is-riding ~ .dust-two { animation-delay:.35s; }
+@keyframes wheel-spin { to { transform:rotate(360deg); } }
+@keyframes rider-bob { from { transform:translateY(0) rotate(0); } to { transform:translateY(-3px) rotate(-1deg); } }
+@keyframes rider-jump { 0% { transform:translateY(0) rotate(0); } 45% { transform:translateY(-34px) rotate(-7deg); } 72% { transform:translateY(-9px) rotate(3deg); } 100% { transform:translateY(0) rotate(0); } }
+@keyframes dust-puff { 0% { opacity:.85; transform:translate(0,0) scale(.5); } 100% { opacity:0; transform:translate(-24px,-10px) scale(1.5); } }
 .dust { position:absolute; z-index:2; bottom:48px; width:10px; height:10px; border-radius:50%; background:#ead4ad; box-shadow:12px 4px 0 #ead4ad,22px -3px 0 #ead4ad; }.dust-one { left:4%; }.dust-two { left:50%; opacity:.5; }
 .checkpoint { position:absolute; bottom:5px; z-index:4; color:#fff4dd; font:800 11px Barlow Condensed; letter-spacing:2px; text-shadow:1px 2px var(--dirt-dark); }.checkpoint.start { left:3%; }.checkpoint.finish { right:3%; }
 .screen { display:none; animation:enter .28s ease; }.screen.active { display:block; }
