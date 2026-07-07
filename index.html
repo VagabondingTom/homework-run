@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#79d5e8" />
+    <title>Homework Run</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <button class="brand" type="button" data-action="home" aria-label="Homework Run Startseite">
+          <span class="brand-mark">HR</span>
+          <span>HOMEWORK<br /><strong>RUN</strong></span>
+        </button>
+        <div class="header-actions">
+          <button class="history-link" type="button" data-action="history">VERLAUF</button>
+          <div class="stage-count"><span id="progress-number">0</span><small>/ 5 RUNS</small></div>
+        </div>
+      </header>
+
+      <div class="progress" aria-label="Fortschritt: 0 von 5 Runs">
+        <span id="progress-bar"></span>
+      </div>
+
+      <section class="track" aria-hidden="true">
+        <div class="sun"></div>
+        <div class="cloud cloud-one"></div>
+        <div class="cloud cloud-two"></div>
+        <div class="hills"></div>
+        <div class="track-line">
+          <span class="ramp ramp-one"></span>
+          <span class="ramp ramp-two"></span>
+        </div>
+        <div class="rider" id="rider">
+          <svg viewBox="0 0 120 78" role="presentation">
+            <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="27" cy="55" r="17" stroke-width="6" />
+              <circle cx="92" cy="55" r="17" stroke-width="6" />
+              <path d="M27 55 47 28l19 27H27Zm20-27h25l20 27M66 55l13-35M71 20h16M42 24h12" stroke-width="6" />
+              <circle cx="66" cy="10" r="8" fill="currentColor" stroke-width="3" />
+              <path d="m63 19-11 20m13-18 17 10m-30 8 14 16" stroke-width="7" />
+            </g>
+          </svg>
+        </div>
+        <i class="dust dust-one"></i><i class="dust dust-two"></i>
+        <span class="checkpoint start">START</span>
+        <span class="checkpoint finish">FINISH</span>
+      </section>
+
+      <section class="screen active" data-screen="entry">
+        <p class="eyebrow">NEUER RUN</p>
+        <h1>Was steht heute an?</h1>
+        <p class="intro">Tragt gemeinsam die Hausaufgabe ein. Wir machen daraus deinen nächsten Run.</p>
+
+        <form id="quest-form" novalidate>
+          <label>Fach
+            <select id="subject">
+              <option>Deutsch</option>
+              <option>Englisch</option>
+              <option>Mathe</option>
+              <option>Französisch</option>
+              <option>Erdkunde</option>
+              <option>Religion</option>
+              <option>Physik</option>
+            </select>
+          </label>
+          <label>Aufgabe <span>Pflichtfeld</span>
+            <textarea id="task" rows="3" placeholder="z. B. Aufgaben 3 bis 7 auf Seite 42 oder 10 Vokabeln lernen" required></textarea>
+            <small class="error" id="task-error">Bitte tragt zuerst deine Aufgabe ein.</small>
+          </label>
+          <label>Umfang oder Dauer
+            <input id="scope" type="text" placeholder="z. B. 5 Aufgaben oder 10 Minuten" />
+          </label>
+          <button class="button primary" type="submit">QUEST ERSTELLEN <span>→</span></button>
+        </form>
+      </section>
+
+      <section class="screen" data-screen="proposal">
+        <p class="eyebrow">DEIN NÄCHSTER RUN</p>
+        <div class="quest-card">
+          <span class="subject-badge" id="proposal-subject">MATHE</span>
+          <h1 id="proposal-title">Aufgaben 3 bis 7 auf Seite 42</h1>
+          <p id="proposal-scope">5 Aufgaben bis zum Ziel</p>
+        </div>
+        <button class="button primary" data-action="start">Los geht's <span>→</span></button>
+        <button class="button ghost" data-action="edit">NOCH MAL ÄNDERN</button>
+      </section>
+
+      <section class="screen" data-screen="active">
+        <p class="eyebrow">RUN LÄUFT</p>
+        <h1>Bleib auf deiner Linie.</h1>
+        <div class="active-task">
+          <span id="active-subject">MATHE</span>
+          <strong id="active-title">Aufgaben 3 bis 7 auf Seite 42</strong>
+          <small id="active-scope">5 Aufgaben</small>
+        </div>
+        <div class="run-timer" aria-live="off">
+          <span>ZEIT AUF DEM TRACK</span>
+          <strong id="elapsed-time">00:00</strong>
+          <small>Minuten : Sekunden</small>
+        </div>
+        <p class="encouragement">Kein Zeitdruck. Entscheidend ist, dass du die Aufgabe zu Ende bringst.</p>
+        <button class="button primary" data-action="done">AUFGABE GESCHAFFT <span>✓</span></button>
+      </section>
+
+      <section class="screen" data-screen="confirm">
+        <p class="eyebrow">LETZTER CHECK</p>
+        <h1>Run wirklich geschafft?</h1>
+        <p class="intro">Bestätigt gemeinsam, dass die Aufgabe abgeschlossen ist.</p>
+        <div class="confirmation-card">
+          <span>ABGESCHLOSSENE QUEST</span>
+          <strong id="confirm-title">Aufgaben 3 bis 7 auf Seite 42</strong>
+        </div>
+        <div class="confirm-time">
+          <span>ZEIT FÜR DIESEN RUN</span>
+          <strong id="confirm-elapsed-time">00:00</strong>
+          <small>Minuten : Sekunden</small>
+        </div>
+        <button class="button primary" data-action="confirm">JA, GEMEINSAM BESTÄTIGT</button>
+        <button class="button ghost" data-action="back">NOCH NICHT</button>
+      </section>
+
+      <section class="screen" data-screen="success">
+        <p class="eyebrow">RUN COMPLETE</p>
+        <h1>Sauber gelandet!</h1>
+        <p class="intro">Du bist auf dem Track einen Schritt weiter.</p>
+        <div class="reward-box">
+          <span class="burst">NEU</span>
+          <div class="reward-icon">
+            <svg viewBox="0 0 100 100" role="presentation"><path d="M16 57c8-26 23-40 46-42l23 15-7 47-36 10-28-13Z"/><path d="m31 50 20-15 23 8-7 22-31 7Z"/><circle cx="55" cy="54" r="7"/></svg>
+          </div>
+          <p>ÜBERRASCHUNG FREIGESCHALTET</p>
+          <strong id="reward-name">Neuer Dirt-Helm</strong>
+        </div>
+        <button class="button primary" data-action="new">NÄCHSTER RUN <span>→</span></button>
+        <button class="button ghost" data-action="history">VERLAUF ANSEHEN</button>
+      </section>
+
+      <section class="screen" data-screen="history">
+        <p class="eyebrow">DEINE RUNS</p>
+        <h1>Questverlauf</h1>
+        <p class="intro">Hier siehst du, was du bereits geschafft hast.</p>
+        <div class="history-summary">
+          <div><strong id="history-count">0</strong><span>Runs geschafft</span></div>
+          <div><strong id="history-total-time">00:00</strong><span>Zeit auf dem Track</span></div>
+        </div>
+        <div class="history-list" id="history-list"></div>
+        <button class="button ghost" data-action="history-back">ZURÜCK</button>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
+^
