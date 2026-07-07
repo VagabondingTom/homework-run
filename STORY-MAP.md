@@ -243,3 +243,153 @@ Bei einem einzelnen Testnutzer sind Prozentkennzahlen wenig aussagekräftig. Beo
 - Soll ein nicht abgeschlossener Versuch gespeichert werden, ohne den Fortschritt zu erhöhen?
 
 Keine dieser Fragen blockiert den klickbaren ersten Ablauf. Motiv und Überraschungen sollten jedoch vor AP-06 gemeinsam mit dem Kind ausgewählt werden.
+
+---
+
+## 10. Erweiterung: Begrenzte Run-Runden
+
+### Problem
+
+Der aktuelle Fortschritt zeigt fünf Runs, begrenzt die Nutzung aber nicht. Nach dem fünften Run können beliebig weitere Runs gestartet werden; dadurch fehlt einer Lernrunde ein bewusst gesetztes Ziel und ein erkennbares Ende.
+
+### Produktentscheidung
+
+Mutter und Kind legen vor Beginn einer Runde gemeinsam fest, wie viele Runs sie schaffen möchten. Eine Runde umfasst **ein bis fünf Runs**. Das Ziel kann nach dem ersten gestarteten Run nicht mehr verändert werden. Sobald alle geplanten Runs abgeschlossen sind, endet die Runde verbindlich auf einer Abschlussseite. Ein weiterer Run ist erst nach dem bewussten Start einer neuen Runde möglich.
+
+### User Stories
+
+#### US-08: Run-Ziel festlegen
+
+**Als Mutter und Kind möchten wir vor Beginn festlegen, wie viele Runs wir heute schaffen wollen, damit die Runde überschaubar und realistisch bleibt.**
+
+Akzeptanzkriterien:
+
+- Vor der ersten Hausaufgabe einer neuen Runde wird ein Ziel zwischen einem und fünf Runs ausgewählt.
+- Ohne ausgewähltes Ziel kann keine Runde gestartet werden.
+- Das gewählte Ziel wird vor dem Start deutlich angezeigt.
+- Nach Beginn des ersten Runs kann das Ziel nicht mehr verändert werden.
+- Das Ziel bleibt nach dem Schließen oder Neuladen der App erhalten.
+
+#### US-09: Dynamischen Rundenfortschritt sehen
+
+**Als Schüler möchte ich jederzeit sehen, wie viele Runs meiner aktuellen Runde bereits geschafft sind, damit das Ziel greifbar bleibt.**
+
+Akzeptanzkriterien:
+
+- Die Kopfzeile zeigt „abgeschlossene Runs / geplante Runs“, beispielsweise „2 / 3 Runs“.
+- Track und Fortschrittsbalken verwenden das gewählte Ziel anstelle eines festen Werts von fünf.
+- Jeder bestätigte Run erhöht den Rundenfortschritt genau einmal.
+- Der Fortschritt kann das gewählte Ziel nicht überschreiten.
+- Frühere Runs aus abgeschlossenen Runden zählen nicht zur aktuellen Runde.
+
+#### US-10: Runde verbindlich abschließen
+
+**Als Schüler möchte ich nach dem letzten geplanten Run eine Abschlussseite sehen, damit ich die gesamte Runde als Erfolg wahrnehme.**
+
+Akzeptanzkriterien:
+
+- Nach Bestätigung des letzten geplanten Runs erscheint die Rundenabschlussseite statt der üblichen Seite „Nächster Run“.
+- Die Abschlussseite zeigt die Anzahl abgeschlossener Runs und die gesamte benötigte Zeit.
+- Die einzelnen Quests der Runde werden mit Fach, Aufgabe und Laufzeit zusammengefasst.
+- Auf der Abschlussseite kann kein weiterer Run zur beendeten Runde hinzugefügt werden.
+- Eine abgeschlossene Runde bleibt nach einem Neustart abgeschlossen.
+
+#### US-11: Neue Runde beginnen
+
+**Als Mutter und Kind möchten wir nach einem Abschluss bewusst eine neue Runde starten, damit wir ein neues realistisches Ziel vereinbaren können.**
+
+Akzeptanzkriterien:
+
+- Die Abschlussseite bietet die eindeutige Aktion „Neue Runde planen“.
+- Vor der nächsten Hausaufgabe muss erneut ein Ziel zwischen einem und fünf Runs gewählt werden.
+- Die abgeschlossene Runde bleibt im Verlauf erhalten.
+- Fortschritt und Timer der neuen Runde beginnen bei null.
+
+### Nicht-Ziele dieser Erweiterung
+
+- Keine automatische Empfehlung für die optimale Anzahl an Runs.
+- Keine Änderung des Ziels während einer laufenden Runde.
+- Keine täglichen Serien, Ranglisten oder Strafen für abgebrochene Runden.
+- Keine zeitliche Obergrenze für eine Runde.
+- Keine Synchronisierung einer Runde zwischen mehreren Geräten.
+
+## 11. Aufgabenpakete für begrenzte Run-Runden
+
+### AP-08: Runden-Datenmodell und Migration
+
+- Datenmodell für aktuelle und abgeschlossene Runden ergänzen
+- Zielanzahl, Rundenstatus, Start- und Abschlusszeit speichern
+- abgeschlossene Quests eindeutig einer Runde zuordnen
+- vorhandene lokal gespeicherte Quests ohne Datenverlust übernehmen
+- ungültige oder unvollständige Altdaten sicher behandeln
+
+**Ergebnis:** Die App kann eine laufende Runde eindeutig von früheren Runden unterscheiden.
+
+### AP-09: Rundenplanung
+
+- neue Startansicht zur Auswahl von ein bis fünf Runs gestalten
+- Auswahl und Bestätigung des Rundenziels umsetzen
+- Änderung vor dem ersten Run ermöglichen
+- Änderung nach Beginn sperren
+- mobile Darstellung und Touch-Bedienung sicherstellen
+
+**Deckt ab:** US-08
+
+### AP-10: Dynamischer Fortschritt
+
+- feste „5 Runs“-Logik durch das gewählte Rundenziel ersetzen
+- Kopfzeile, Fortschrittsbalken und Fahrerposition dynamisch berechnen
+- Überlaufen über das Rundenlimit technisch verhindern
+- Wiederherstellung des korrekten Fortschritts nach Neuladen prüfen
+
+**Deckt ab:** US-09
+
+### AP-11: Abschlusslogik und Rundenabschlussseite
+
+- nach jedem bestätigten Run prüfen, ob das Rundenziel erreicht ist
+- beim letzten Run zur Rundenabschlussseite weiterleiten
+- Gesamtzeit aus den Laufzeiten der Rundenquests berechnen
+- Zusammenfassung aller Runs der Runde anzeigen
+- „Nächster Run“ auf einer beendeten Runde entfernen
+
+**Deckt ab:** US-10
+
+### AP-12: Neue Runde starten
+
+- Aktion „Neue Runde planen“ ergänzen
+- abgeschlossene Runde dauerhaft archivieren
+- aktive Quest, Timer und Rundenfortschritt sauber zurücksetzen
+- erneute Zielauswahl erzwingen
+
+**Deckt ab:** US-11
+
+### AP-13: Questverlauf auf Runden erweitern
+
+- Verlauf nach Runden gruppieren
+- Ziel, tatsächlich abgeschlossene Runs und Gesamtzeit je Runde anzeigen
+- laufende und abgeschlossene Runden visuell unterscheiden
+- ältere Einzelquests aus der bisherigen Datenstruktur weiterhin anzeigen
+
+**Ergebnis:** Der Verlauf erzählt nicht nur einzelne Aufgaben, sondern abgeschlossene Lernrunden.
+
+### AP-14: Qualitätssicherung und Nutzertest
+
+- Ziele von einem, drei und fünf Runs vollständig durchspielen
+- Neuladen während Planung, laufendem Run und Abschluss testen
+- doppelte Bestätigung des letzten Runs verhindern
+- prüfen, dass nach Erreichen des Ziels kein weiterer Run möglich ist
+- neue Runde starten und Trennung der Verläufe prüfen
+- Smartphone und Tablet im Hochformat sowie Tablet im Querformat testen
+- Nutzertest mit einer echten Hausaufgabenrunde durchführen
+
+**Erfolgskriterium:** Mutter und Kind können ein Ziel festlegen, genau diese Anzahl an Runs abschließen und anschließend selbstständig eine neue Runde planen.
+
+## 12. Empfohlene Umsetzungsreihenfolge der Erweiterung
+
+1. AP-08 – Datenmodell und sichere Migration
+2. AP-09 – Rundenplanung
+3. AP-10 – dynamischer Fortschritt
+4. AP-11 – verbindliches Rundenende
+5. AP-12 – neue Runde
+6. AP-13 – gruppierter Verlauf
+7. AP-14 – Geräteprüfung und Nutzertest
