@@ -16,6 +16,8 @@ Die App besteht aus statischen Dateien. `index.html` kann direkt im Browser geö
 - Fortschritt und zufällige Belohnung anzeigen
 - dynamischen Rundenfortschritt und verbindlichen Rundenabschluss anzeigen
 - neue Runde erst nach Abschluss bewusst planen
+- Gegenstände ohne anfängliche Dopplungen freischalten
+- gesammelte Gegenstände dauerhaft in der persönlichen Garage anzeigen
 - Questverlauf mit Laufzeit und Datum
 - lokale Speicherung ohne Konto oder Cloud
 - responsive Darstellung für Smartphone und Tablet
