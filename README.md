@@ -1,6 +1,6 @@
 # Homework Run
 
-Eine mobile BMX-Dirt-Track-Web-App, die Hausaufgaben in überschaubare Quests verwandelt. Abgeschlossene Runs werden mit Zeit, Fortschritt und einer kleinen Überraschung lokal im Browser gespeichert.
+Eine mobile BMX-Dirt-Track-Web-App, die Hausaufgaben in überschaubare Motos verwandelt. Abgeschlossene Motos werden mit Zeit, Fortschritt und einer kleinen Überraschung lokal im Browser gespeichert.
 
 ## Lokal starten
 
@@ -9,22 +9,23 @@ Die App besteht aus statischen Dateien. `index.html` kann direkt im Browser geö
 ## Funktionen
 
 - Hausaufgabe nach Fach, Aufgabe und Umfang erfassen
-- frei wählbares Rundenziel gemeinsam festlegen
-- Quest-Vorschlag annehmen
-- vergangene Zeit während des Runs messen
+- frei wählbares Session-Ziel gemeinsam festlegen
+- Moto-Vorschlag annehmen
+- vergangene Zeit während des Motos messen
 - Abschluss gemeinsam bestätigen
-- Fortschritt und zufällige Belohnung anzeigen
-- dynamischen Rundenfortschritt und verbindlichen Rundenabschluss anzeigen
-- neue Runde erst nach Abschluss bewusst planen
+- nach jedem Moto Fortschritt anzeigen
+- einen zufälligen Gewinn erst am Ende einer abgeschlossenen Session freischalten
+- dynamischen Session-Fortschritt und verbindlichen Session-Abschluss anzeigen
+- neue Session erst nach Abschluss bewusst planen
 - Gegenstände ohne anfängliche Dopplungen freischalten
 - gesammelte Gegenstände dauerhaft in der persönlichen Garage anzeigen
-- Questverlauf mit Laufzeit und Datum
+- Motoverlauf mit Laufzeit und Datum
 - lokale Speicherung ohne Konto oder Cloud
 - responsive Darstellung für Smartphone und Tablet
 
 ## Datenschutz
 
-Alle Questdaten werden ausschließlich im lokalen Browser-Speicher des verwendeten Geräts abgelegt. Es werden keine Daten an einen Server übertragen.
+Alle Moto-Daten werden ausschließlich im lokalen Browser-Speicher des verwendeten Geräts abgelegt. Es werden keine Daten an einen Server übertragen.
 
 ## Veröffentlichung
 

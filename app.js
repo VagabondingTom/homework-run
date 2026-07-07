@@ -44,7 +44,7 @@ let state = {
   currentSession: null,
   sessions: [],
   lastCompletedSessionId: null,
-  currentReward: rewardCatalog[0].name
+  currentReward: null
 };
 let timerId;
 let screenBeforeHistory = 'entry';
@@ -244,10 +244,8 @@ function fillQuest() {
   document.querySelector('#proposal-scope').textContent = scope || 'Eine Aufgabe bis zum Ziel';
   document.querySelector('#active-subject').textContent = subject.toUpperCase();
   document.querySelector('#active-title').textContent = task;
-  document.querySelector('#active-scope').textContent = scope || 'Dein heutiger Run';
+  document.querySelector('#active-scope').textContent = scope || 'Dein heutiges Moto';
   document.querySelector('#confirm-title').textContent = task;
-  document.querySelector('#reward-name').textContent = state.currentReward;
-  document.querySelector('#reward-symbol').innerHTML = getRewardIcon(state.currentReward);
 }
 
 function getRewardMeta(rewardName) {
@@ -286,7 +284,7 @@ function updateProgress() {
   document.querySelector('#rider').style.left = `${2 + fraction * 76}%`;
   document.querySelector('.progress').setAttribute(
     'aria-label',
-    targetRuns ? `Fortschritt: ${completedRuns} von ${targetRuns} Runs` : 'Noch keine Runde geplant'
+    targetRuns ? `Fortschritt: ${completedRuns} von ${targetRuns} Motos` : 'Noch keine Session geplant'
   );
   renderRoundContext();
 }
@@ -295,7 +293,7 @@ function renderRoundContext() {
   const session = state.currentSession;
   if (!session) return;
   const nextRun = Math.min(session.runIds.length + 1, session.targetRuns);
-  document.querySelector('#round-context-label').textContent = `RUN ${nextRun} VON ${session.targetRuns}`;
+  document.querySelector('#round-context-label').textContent = `MOTO ${nextRun} VON ${session.targetRuns}`;
   document.querySelector('#edit-target-button').hidden = session.goalLocked;
 }
 
@@ -311,15 +309,22 @@ function renderSessionComplete() {
     .map((id) => state.completedQuests.find((quest) => quest.id === id))
     .filter(Boolean);
   const totalTime = runs.reduce((sum, run) => sum + run.elapsedSeconds, 0);
+  const sessionReward = [...runs].reverse().find((run) => run.reward)?.reward;
 
   document.querySelector('#session-finish-count').textContent = `${runs.length} / ${session.targetRuns}`;
   document.querySelector('#session-finish-time').textContent = formatTime(totalTime);
+  const rewardBox = document.querySelector('#session-reward-box');
+  rewardBox.hidden = !sessionReward;
+  if (sessionReward) {
+    document.querySelector('#session-reward-name').textContent = sessionReward;
+    document.querySelector('#session-reward-symbol').innerHTML = getRewardIcon(sessionReward);
+  }
   document.querySelector('#session-finish-list').innerHTML = runs.map((run, index) => `
     <article class="session-finish-item">
       <span>${index + 1}</span>
       <div><span>${escapeHtml(run.subject.toUpperCase())}</span><strong>${escapeHtml(run.task)}</strong></div>
       <time>${formatTime(run.elapsedSeconds)}</time>
-      <span class="session-finish-reward">${getRewardIcon(run.reward, true)} ${escapeHtml(run.reward)}</span>
+      ${run.reward ? `<span class="session-finish-reward">${getRewardIcon(run.reward, true)} ${escapeHtml(run.reward)}</span>` : ''}
     </article>
   `).join('');
   return true;
@@ -359,7 +364,7 @@ function renderHistory() {
   const list = document.querySelector('#history-list');
 
   if (!items.length) {
-    list.innerHTML = '<div class="history-empty">Noch kein Run abgeschlossen. Deine erste Ziellinie wartet schon.</div>';
+    list.innerHTML = '<div class="history-empty">Noch kein Moto abgeschlossen. Deine erste Ziellinie wartet schon.</div>';
     return;
   }
 
@@ -369,7 +374,7 @@ function renderHistory() {
       <strong>${escapeHtml(item.task)}</strong>
       <time datetime="${item.completedAt}">${formatDate(item.completedAt)}</time>
       <span class="history-duration">${formatTime(item.elapsedSeconds)}</span>
-      <span class="history-reward">Freigeschaltet: ${escapeHtml(item.reward)}</span>
+      ${item.reward ? `<span class="history-reward">Session-Gewinn: ${escapeHtml(item.reward)}</span>` : ''}
     </article>
   `).join('');
 }
@@ -451,13 +456,14 @@ document.addEventListener('click', (event) => {
     if (!session || session.status !== 'active' || session.runIds.length >= session.targetRuns) {
       updateProgress(); show(session ? 'session-complete' : 'planning'); return;
     }
-    state.currentReward = chooseUniqueReward();
+    const finishesSession = session.runIds.length + 1 >= session.targetRuns;
+    state.currentReward = finishesSession ? chooseUniqueReward() : null;
     const completedQuest = {
       id: `${Date.now()}`,
       ...state.quest,
       elapsedSeconds: state.elapsedSeconds,
       completedAt: new Date().toISOString(),
-      reward: state.currentReward,
+      reward: state.currentReward || null,
       sessionId: session.id
     };
     state.completedQuests.push(completedQuest);

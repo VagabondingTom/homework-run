@@ -15,11 +15,11 @@
           <span>HOMEWORK<br /><strong>RUN</strong></span>
         </button>
         <div class="header-actions">
-          <div class="stage-count"><span id="progress-number">0</span><small>/ <span id="progress-target">?</span> RUNS</small></div>
+          <div class="stage-count"><span id="progress-number">0</span><small>/ <span id="progress-target">?</span> MOTOS</small></div>
         </div>
       </header>
 
-      <div class="progress" aria-label="Noch keine Runde geplant">
+      <div class="progress" aria-label="Noch keine Session geplant">
         <span id="progress-bar"></span>
       </div>
 
@@ -77,31 +77,31 @@
       </section>
 
       <section class="screen active" data-screen="planning">
-        <p class="eyebrow">NEUE RUNDE</p>
-        <h1>Wie viele Runs plant ihr?</h1>
-        <p class="intro">Legt gemeinsam ein erreichbares Ziel fest. Nach dem letzten Run endet die Runde mit einer Übersicht.</p>
+        <p class="eyebrow">NEUE SESSION</p>
+        <h1>Wie viele Motos plant ihr?</h1>
+        <p class="intro">Legt gemeinsam ein erreichbares Ziel fest. Nach dem letzten Moto endet die Session mit einer Übersicht.</p>
         <form id="session-form">
           <fieldset class="run-goal-fieldset">
-            <legend>Runs für diese Runde</legend>
+            <legend>Motos für diese Session</legend>
             <div class="run-goal-custom">
-              <button type="button" data-action="goal-decrease" aria-label="Einen Run weniger">−</button>
+              <button type="button" data-action="goal-decrease" aria-label="Ein Moto weniger">−</button>
               <input id="run-goal" name="run-goal" type="number" min="1" step="1" inputmode="numeric" placeholder="3" required aria-describedby="goal-hint goal-error" />
-              <button type="button" data-action="goal-increase" aria-label="Einen Run mehr">+</button>
+              <button type="button" data-action="goal-increase" aria-label="Ein Moto mehr">+</button>
             </div>
-            <small class="goal-hint" id="goal-hint">Mindestens 1 Run</small>
-            <small class="error" id="goal-error">Bitte wählt zuerst ein Rundenziel.</small>
+            <small class="goal-hint" id="goal-hint">Mindestens 1 Moto</small>
+            <small class="error" id="goal-error">Bitte wählt zuerst ein Session-Ziel.</small>
           </fieldset>
-          <button class="button primary" type="submit">RUNDE PLANEN <span>→</span></button>
+          <button class="button primary" type="submit">SESSION PLANEN <span>→</span></button>
         </form>
       </section>
 
       <section class="screen" data-screen="entry">
-        <p class="eyebrow">NEUER RUN</p>
+        <p class="eyebrow">NEUES MOTO</p>
         <h1>Was steht heute an?</h1>
-        <p class="intro">Tragt gemeinsam die Hausaufgabe ein. Wir machen daraus deinen nächsten Run.</p>
+        <p class="intro">Tragt gemeinsam die Hausaufgabe ein. Wir machen daraus dein nächstes Moto.</p>
 
         <div class="round-context">
-          <span id="round-context-label">RUN 1 VON 3</span>
+          <span id="round-context-label">MOTO 1 VON 3</span>
           <button type="button" data-action="edit-target" id="edit-target-button">ZIEL ÄNDERN</button>
         </div>
 
@@ -124,23 +124,23 @@
           <label>Umfang oder Dauer
             <input id="scope" type="text" placeholder="z. B. 5 Aufgaben oder 10 Minuten" />
           </label>
-          <button class="button primary" type="submit">QUEST ERSTELLEN <span>→</span></button>
+          <button class="button primary" type="submit">MOTO PLANEN <span>→</span></button>
         </form>
       </section>
 
       <section class="screen" data-screen="proposal">
-        <p class="eyebrow">DEIN NÄCHSTER RUN</p>
+        <p class="eyebrow">DEIN NÄCHSTES MOTO</p>
         <div class="quest-card">
           <span class="subject-badge" id="proposal-subject">MATHE</span>
           <h1 id="proposal-title">Aufgaben 3 bis 7 auf Seite 42</h1>
           <p id="proposal-scope">5 Aufgaben bis zum Ziel</p>
         </div>
-        <button class="button primary" data-action="start">Los geht's <span>→</span></button>
+        <button class="button primary" data-action="start">ROLL-IN <span>→</span></button>
         <button class="button ghost" data-action="edit">NOCH MAL ÄNDERN</button>
       </section>
 
       <section class="screen" data-screen="active">
-        <p class="eyebrow">RUN LÄUFT</p>
+        <p class="eyebrow">MOTO LÄUFT</p>
         <h1>Bleib auf deiner Linie.</h1>
         <div class="active-task">
           <span id="active-subject">MATHE</span>
@@ -153,19 +153,19 @@
           <small>Minuten : Sekunden</small>
         </div>
         <p class="encouragement">Kein Zeitdruck. Entscheidend ist, dass du die Aufgabe zu Ende bringst.</p>
-        <button class="button primary" data-action="done">AUFGABE GESCHAFFT <span>✓</span></button>
+        <button class="button primary" data-action="done">MOTO GESCHAFFT <span>✓</span></button>
       </section>
 
       <section class="screen" data-screen="confirm">
         <p class="eyebrow">LETZTER CHECK</p>
-        <h1>Run wirklich geschafft?</h1>
+        <h1>Moto wirklich geschafft?</h1>
         <p class="intro">Bestätigt gemeinsam, dass die Aufgabe abgeschlossen ist.</p>
         <div class="confirmation-card">
-          <span>ABGESCHLOSSENE QUEST</span>
+          <span>ABGESCHLOSSENES MOTO</span>
           <strong id="confirm-title">Aufgaben 3 bis 7 auf Seite 42</strong>
         </div>
         <div class="confirm-time">
-          <span>ZEIT FÜR DIESEN RUN</span>
+          <span>ZEIT FÜR DIESES MOTO</span>
           <strong id="confirm-elapsed-time">00:00</strong>
           <small>Minuten : Sekunden</small>
         </div>
@@ -174,32 +174,36 @@
       </section>
 
       <section class="screen" data-screen="success">
-        <p class="eyebrow">RUN COMPLETE</p>
+        <p class="eyebrow">MOTO DIALED</p>
         <h1>Sauber gelandet!</h1>
         <p class="intro">Starke Landung. Du bist auf dem Track einen Schritt weiter.</p>
-        <div class="reward-box">
-          <span class="burst">NEU</span>
-          <div class="reward-icon">
-            <span id="reward-symbol" aria-hidden="true"></span>
-          </div>
-          <p>ÜBERRASCHUNG FREIGESCHALTET</p>
-          <strong id="reward-name">Neuer Dirt-Helm</strong>
+        <div class="moto-progress-card">
+          <span aria-hidden="true">✓</span>
+          <div><strong>MOTO IM ZIEL</strong><small>Der Gewinn wartet am Session-Finish.</small></div>
         </div>
-        <button class="button primary" data-action="new">NÄCHSTER RUN <span>→</span></button>
+        <button class="button primary" data-action="new">NÄCHSTES MOTO <span>→</span></button>
         <button class="button ghost" data-action="history">VERLAUF ANSEHEN</button>
       </section>
 
       <section class="screen" data-screen="session-complete">
-        <p class="eyebrow">RUNDE GESCHAFFT</p>
+        <p class="eyebrow">SESSION DIALED</p>
         <h1>Über die Ziellinie!</h1>
-        <p class="intro">Alle Runs geschafft. Ihr habt euer vereinbartes Ziel gemeinsam erreicht.</p>
+        <p class="intro">Alle Motos geschafft. Ihr habt euer vereinbartes Session-Ziel gemeinsam erreicht.</p>
         <div class="finish-stamp" aria-hidden="true"><span>🏁</span><strong>TRACK<br />COMPLETE</strong></div>
+        <div class="reward-box session-reward-box" id="session-reward-box">
+          <span class="burst">SESSION DROP</span>
+          <div class="reward-icon">
+            <span id="session-reward-symbol" aria-hidden="true"></span>
+          </div>
+          <p>GEWINN FREIGESCHALTET</p>
+          <strong id="session-reward-name">Neuer Dirt-Helm</strong>
+        </div>
         <div class="session-finish-stats">
-          <div><strong id="session-finish-count">0 / 0</strong><span>Runs geschafft</span></div>
+          <div><strong id="session-finish-count">0 / 0</strong><span>Motos geschafft</span></div>
           <div><strong id="session-finish-time">00:00</strong><span>Gesamtzeit</span></div>
         </div>
         <div class="session-finish-list" id="session-finish-list"></div>
-        <button class="button primary" data-action="new-session">NEUE RUNDE PLANEN <span>→</span></button>
+        <button class="button primary" data-action="new-session">NEUE SESSION PLANEN <span>→</span></button>
         <button class="button ghost" data-action="garage">GEGENSTÄNDE ANSEHEN</button>
         <button class="button ghost" data-action="history">VERLAUF ANSEHEN</button>
       </section>
@@ -207,18 +211,18 @@
       <section class="screen" data-screen="garage">
         <p class="eyebrow">DEINE SAMMLUNG</p>
         <h1>Meine Garage</h1>
-        <p class="intro">Jeder geschaffte Run bringt ein neues Teil, einen Sticker oder ein Track-Extra in deine Sammlung.</p>
+        <p class="intro">Jede abgeschlossene Session bringt ein neues Teil, einen Sticker oder ein Track-Extra in deine Sammlung.</p>
         <div class="garage-summary"><strong id="garage-count">0</strong><span>Gegenstände freigeschaltet</span></div>
         <div class="garage-grid" id="garage-list"></div>
         <button class="button ghost" data-action="garage-back">ZURÜCK</button>
       </section>
 
       <section class="screen" data-screen="history">
-        <p class="eyebrow">DEINE RUNS</p>
-        <h1>Questverlauf</h1>
+        <p class="eyebrow">DEINE MOTOS</p>
+        <h1>Motoverlauf</h1>
         <p class="intro">Hier siehst du, was du bereits geschafft hast.</p>
         <div class="history-summary">
-          <div><strong id="history-count">0</strong><span>Runs geschafft</span></div>
+          <div><strong id="history-count">0</strong><span>Motos geschafft</span></div>
           <div><strong id="history-total-time">00:00</strong><span>Zeit auf dem Track</span></div>
         </div>
         <div class="history-list" id="history-list"></div>
