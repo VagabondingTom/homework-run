@@ -9,7 +9,7 @@ Die App besteht aus statischen Dateien. `index.html` kann direkt im Browser geö
 ## Funktionen
 
 - Hausaufgabe nach Fach, Aufgabe und Umfang erfassen
-- Rundenziel von einem bis fünf Runs gemeinsam festlegen
+- frei wählbares Rundenziel gemeinsam festlegen
 - Quest-Vorschlag annehmen
 - vergangene Zeit während des Runs messen
 - Abschluss gemeinsam bestätigen
