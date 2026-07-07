@@ -15,7 +15,6 @@
           <span>HOMEWORK<br /><strong>RUN</strong></span>
         </button>
         <div class="header-actions">
-          <button class="history-link" type="button" data-action="history">VERLAUF</button>
           <div class="stage-count"><span id="progress-number">0</span><small>/ <span id="progress-target">?</span> RUNS</small></div>
         </div>
       </header>
@@ -23,6 +22,11 @@
       <div class="progress" aria-label="Noch keine Runde geplant">
         <span id="progress-bar"></span>
       </div>
+
+      <nav class="utility-nav" aria-label="Sammlung und Verlauf">
+        <button type="button" data-action="history">VERLAUF</button>
+        <button type="button" data-action="garage">MEINE GARAGE</button>
+      </nav>
 
       <section class="track" aria-hidden="true">
         <div class="sun"></div>
@@ -159,7 +163,7 @@
         <div class="reward-box">
           <span class="burst">NEU</span>
           <div class="reward-icon">
-            <svg viewBox="0 0 100 100" role="presentation"><path d="M16 57c8-26 23-40 46-42l23 15-7 47-36 10-28-13Z"/><path d="m31 50 20-15 23 8-7 22-31 7Z"/><circle cx="55" cy="54" r="7"/></svg>
+            <span id="reward-symbol" aria-hidden="true">◆</span>
           </div>
           <p>ÜBERRASCHUNG FREIGESCHALTET</p>
           <strong id="reward-name">Neuer Dirt-Helm</strong>
@@ -178,7 +182,17 @@
         </div>
         <div class="session-finish-list" id="session-finish-list"></div>
         <button class="button primary" data-action="new-session">NEUE RUNDE PLANEN <span>→</span></button>
+        <button class="button ghost" data-action="garage">GEGENSTÄNDE ANSEHEN</button>
         <button class="button ghost" data-action="history">VERLAUF ANSEHEN</button>
+      </section>
+
+      <section class="screen" data-screen="garage">
+        <p class="eyebrow">DEINE SAMMLUNG</p>
+        <h1>Meine Garage</h1>
+        <p class="intro">Jeder geschaffte Run bringt ein neues Teil, einen Sticker oder ein Track-Extra in deine Sammlung.</p>
+        <div class="garage-summary"><strong id="garage-count">0</strong><span>Gegenstände freigeschaltet</span></div>
+        <div class="garage-grid" id="garage-list"></div>
+        <button class="button ghost" data-action="garage-back">ZURÜCK</button>
       </section>
 
       <section class="screen" data-screen="history">
