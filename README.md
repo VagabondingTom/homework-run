@@ -9,10 +9,13 @@ Die App besteht aus statischen Dateien. `index.html` kann direkt im Browser geö
 ## Funktionen
 
 - Hausaufgabe nach Fach, Aufgabe und Umfang erfassen
+- Rundenziel von einem bis fünf Runs gemeinsam festlegen
 - Quest-Vorschlag annehmen
 - vergangene Zeit während des Runs messen
 - Abschluss gemeinsam bestätigen
 - Fortschritt und zufällige Belohnung anzeigen
+- dynamischen Rundenfortschritt und verbindlichen Rundenabschluss anzeigen
+- neue Runde erst nach Abschluss bewusst planen
 - Questverlauf mit Laufzeit und Datum
 - lokale Speicherung ohne Konto oder Cloud
 - responsive Darstellung für Smartphone und Tablet
