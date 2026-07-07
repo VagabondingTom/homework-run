@@ -1,6 +1,6 @@
-const STATE_VERSION = 2;
-const STORAGE_KEY = 'homework-run-state-v2';
-const LEGACY_STORAGE_KEY = 'homework-run-state-v1';
+const STATE_VERSION = 3;
+const STORAGE_KEY = 'homework-run-state-v3';
+const LEGACY_STORAGE_KEYS = ['homework-run-state-v2', 'homework-run-state-v1'];
 const screens = [...document.querySelectorAll('.screen')];
 const form = document.querySelector('#quest-form');
 const sessionForm = document.querySelector('#session-form');
@@ -12,7 +12,7 @@ let state = {
   quest: { subject: 'Deutsch', task: '', scope: '' },
   progress: 0,
   elapsedSeconds: 0,
-  currentScreen: 'entry',
+  currentScreen: 'planning',
   completedQuests: [],
   currentSession: null,
   sessions: [],
@@ -25,16 +25,16 @@ let screenBeforeHistory = 'entry';
 function loadState() {
   try {
     const currentState = localStorage.getItem(STORAGE_KEY);
-    const legacyState = localStorage.getItem(LEGACY_STORAGE_KEY);
+    const legacyState = LEGACY_STORAGE_KEYS.map((key) => localStorage.getItem(key)).find(Boolean);
     const saved = JSON.parse(currentState || legacyState);
     if (saved && typeof saved === 'object') {
       state = migrateState(saved);
       saveState();
-      if (!currentState && legacyState) localStorage.removeItem(LEGACY_STORAGE_KEY);
+      if (!currentState && legacyState) LEGACY_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key));
     }
   } catch (_) {
     localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem(LEGACY_STORAGE_KEY);
+    LEGACY_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key));
   }
 }
 
@@ -60,6 +60,40 @@ function migrateState(saved) {
       currentSession,
       sessions,
       lastCompletedSessionId: saved.lastCompletedSessionId || null
+    };
+  }
+
+  if (saved.schemaVersion === 2) {
+    const oldCurrentSession = saved.currentSession;
+    const oldRunIds = Array.isArray(oldCurrentSession?.runIds) ? oldCurrentSession.runIds : [];
+    const archivedSessions = [...sessions];
+
+    if (oldCurrentSession && oldRunIds.length) {
+      const archivedSession = {
+        ...oldCurrentSession,
+        targetRuns: oldRunIds.length,
+        status: 'completed',
+        goalChosenByUser: false,
+        completedAt: oldCurrentSession.completedAt || new Date().toISOString(),
+        runIds: oldRunIds
+      };
+      const existingIndex = archivedSessions.findIndex((session) => session.id === archivedSession.id);
+      if (existingIndex >= 0) archivedSessions[existingIndex] = archivedSession;
+      else archivedSessions.push(archivedSession);
+    }
+
+    return {
+      ...state,
+      ...saved,
+      schemaVersion: STATE_VERSION,
+      quest: { subject: 'Deutsch', task: '', scope: '' },
+      elapsedSeconds: 0,
+      progress: 0,
+      currentScreen: 'planning',
+      completedQuests,
+      currentSession: null,
+      sessions: archivedSessions,
+      lastCompletedSessionId: oldRunIds.length ? oldCurrentSession.id : (saved.lastCompletedSessionId || null)
     };
   }
 
@@ -107,6 +141,7 @@ function createSession(targetRuns) {
     id: `session-${Date.now()}-${Math.random().toString(16).slice(2)}`,
     targetRuns,
     status: 'active',
+    goalChosenByUser: true,
     goalLocked: false,
     startedAt: new Date().toISOString(),
     completedAt: null,
