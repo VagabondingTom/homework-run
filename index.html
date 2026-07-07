@@ -36,8 +36,14 @@
         <div class="rider" id="rider">
           <svg viewBox="0 0 120 78" role="presentation">
             <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="27" cy="55" r="17" stroke-width="6" />
-              <circle cx="92" cy="55" r="17" stroke-width="6" />
+              <g class="wheel wheel-back">
+                <circle cx="27" cy="55" r="17" stroke-width="6" />
+                <path d="M27 38v34M10 55h34M15 43l24 24M15 67l24-24" stroke-width="2" />
+              </g>
+              <g class="wheel wheel-front">
+                <circle cx="92" cy="55" r="17" stroke-width="6" />
+                <path d="M92 38v34M75 55h34M80 43l24 24M80 67l24-24" stroke-width="2" />
+              </g>
               <path d="M27 55 47 28l19 27H27Zm20-27h25l20 27M66 55l13-35M71 20h16M42 24h12" stroke-width="6" />
               <circle cx="66" cy="10" r="8" fill="currentColor" stroke-width="3" />
               <path d="m63 19-11 20m13-18 17 10m-30 8 14 16" stroke-width="7" />
