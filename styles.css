@@ -35,12 +35,11 @@ h1 { max-width:620px; margin:0 0 12px; color:var(--ink); font:800 clamp(38px,9vw
 form { display:grid; gap:18px; margin-top:28px; }
 fieldset { min-width:0; margin:0; padding:0; border:0; }
 .run-goal-fieldset legend { display:block; width:100%; margin:0; padding:0 0 16px; color:var(--ink); font-weight:700; }
-.run-goals { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
-.run-goals label { display:block; }
-.run-goals input { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
-.run-goals span { display:grid; place-items:center; min-height:60px; padding:10px 2px; border:2px solid var(--ink); border-radius:7px; color:var(--ink); background:white; font:800 28px Barlow Condensed; box-shadow:3px 4px 0 #d8cdbb; cursor:pointer; }
-.run-goals input:checked + span { color:white; background:var(--orange); box-shadow:3px 4px 0 var(--orange-dark); }
-.run-goals input:focus-visible + span { outline:3px solid var(--blue); outline-offset:3px; }
+.run-goal-custom { display:grid; grid-template-columns:58px minmax(90px,180px) 58px; justify-content:start; gap:10px; }
+.run-goal-custom button { display:grid; place-items:center; min-height:58px; border:2px solid var(--ink); border-radius:7px; color:var(--ink); background:white; font:800 30px Barlow Condensed; box-shadow:3px 4px 0 #d8cdbb; cursor:pointer; }
+.run-goal-custom button:active { transform:translate(2px,2px); box-shadow:1px 2px 0 #d8cdbb; }
+.run-goal-custom input { min-height:58px; padding:7px 12px; border-color:var(--ink); text-align:center; font:800 32px Barlow Condensed; font-variant-numeric:tabular-nums; }
+.goal-hint { display:block; margin-top:10px; color:var(--muted); font-size:11px; }
 .round-context { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:22px 0 -8px; padding:11px 13px; border-left:5px solid var(--orange); background:#fff0d2; }
 .round-context span { font:800 14px Barlow Condensed; letter-spacing:1.5px; }
 .round-context button { min-height:44px; border:0; color:var(--orange-dark); background:transparent; font:800 12px Barlow Condensed; letter-spacing:1px; cursor:pointer; }
