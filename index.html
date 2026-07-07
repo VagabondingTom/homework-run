@@ -16,11 +16,11 @@
         </button>
         <div class="header-actions">
           <button class="history-link" type="button" data-action="history">VERLAUF</button>
-          <div class="stage-count"><span id="progress-number">0</span><small>/ 5 RUNS</small></div>
+          <div class="stage-count"><span id="progress-number">0</span><small>/ <span id="progress-target">?</span> RUNS</small></div>
         </div>
       </header>
 
-      <div class="progress" aria-label="Fortschritt: 0 von 5 Runs">
+      <div class="progress" aria-label="Noch keine Runde geplant">
         <span id="progress-bar"></span>
       </div>
 
@@ -49,10 +49,35 @@
         <span class="checkpoint finish">FINISH</span>
       </section>
 
-      <section class="screen active" data-screen="entry">
+      <section class="screen active" data-screen="planning">
+        <p class="eyebrow">NEUE RUNDE</p>
+        <h1>Wie viele Runs plant ihr?</h1>
+        <p class="intro">Legt gemeinsam ein erreichbares Ziel fest. Nach dem letzten Run endet die Runde mit einer Übersicht.</p>
+        <form id="session-form">
+          <fieldset class="run-goal-fieldset">
+            <legend>Runs für diese Runde</legend>
+            <div class="run-goals">
+              <label><input type="radio" name="run-goal" value="1" required /><span>1</span></label>
+              <label><input type="radio" name="run-goal" value="2" /><span>2</span></label>
+              <label><input type="radio" name="run-goal" value="3" /><span>3</span></label>
+              <label><input type="radio" name="run-goal" value="4" /><span>4</span></label>
+              <label><input type="radio" name="run-goal" value="5" /><span>5</span></label>
+            </div>
+            <small class="error" id="goal-error">Bitte wählt zuerst ein Rundenziel.</small>
+          </fieldset>
+          <button class="button primary" type="submit">RUNDE PLANEN <span>→</span></button>
+        </form>
+      </section>
+
+      <section class="screen" data-screen="entry">
         <p class="eyebrow">NEUER RUN</p>
         <h1>Was steht heute an?</h1>
         <p class="intro">Tragt gemeinsam die Hausaufgabe ein. Wir machen daraus deinen nächsten Run.</p>
+
+        <div class="round-context">
+          <span id="round-context-label">RUN 1 VON 3</span>
+          <button type="button" data-action="edit-target" id="edit-target-button">ZIEL ÄNDERN</button>
+        </div>
 
         <form id="quest-form" novalidate>
           <label>Fach
@@ -135,6 +160,19 @@
           <strong id="reward-name">Neuer Dirt-Helm</strong>
         </div>
         <button class="button primary" data-action="new">NÄCHSTER RUN <span>→</span></button>
+        <button class="button ghost" data-action="history">VERLAUF ANSEHEN</button>
+      </section>
+
+      <section class="screen" data-screen="session-complete">
+        <p class="eyebrow">RUNDE GESCHAFFT</p>
+        <h1>Track komplett!</h1>
+        <p class="intro">Ihr habt euer vereinbartes Ziel erreicht. Hier ist eure Runde im Überblick.</p>
+        <div class="session-finish-stats">
+          <div><strong id="session-finish-count">0 / 0</strong><span>Runs geschafft</span></div>
+          <div><strong id="session-finish-time">00:00</strong><span>Gesamtzeit</span></div>
+        </div>
+        <div class="session-finish-list" id="session-finish-list"></div>
+        <button class="button primary" data-action="new-session">NEUE RUNDE PLANEN <span>→</span></button>
         <button class="button ghost" data-action="history">VERLAUF ANSEHEN</button>
       </section>
 
