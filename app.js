@@ -1,15 +1,20 @@
-const STORAGE_KEY = 'homework-run-state-v1';
+const STATE_VERSION = 2;
+const STORAGE_KEY = 'homework-run-state-v2';
+const LEGACY_STORAGE_KEY = 'homework-run-state-v1';
 const screens = [...document.querySelectorAll('.screen')];
 const form = document.querySelector('#quest-form');
 const taskInput = document.querySelector('#task');
 const rewards = ['Neuer Dirt-Helm', 'Flammen-Sticker', 'Orange Griffe', 'Neue Track-Rampe', 'Türkise Pedale'];
 
 let state = {
+  schemaVersion: STATE_VERSION,
   quest: { subject: 'Deutsch', task: '', scope: '' },
   progress: 0,
   elapsedSeconds: 0,
   currentScreen: 'entry',
   completedQuests: [],
+  currentSession: null,
+  sessions: [],
   currentReward: rewards[0]
 };
 let timerId;
@@ -17,18 +22,87 @@ let screenBeforeHistory = 'entry';
 
 function loadState() {
   try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    const currentState = localStorage.getItem(STORAGE_KEY);
+    const legacyState = localStorage.getItem(LEGACY_STORAGE_KEY);
+    const saved = JSON.parse(currentState || legacyState);
     if (saved && typeof saved === 'object') {
-      state = {
-        ...state,
-        ...saved,
-        quest: { ...state.quest, ...(saved.quest || {}) },
-        completedQuests: Array.isArray(saved.completedQuests) ? saved.completedQuests : []
-      };
+      state = migrateState(saved);
+      saveState();
+      if (!currentState && legacyState) localStorage.removeItem(LEGACY_STORAGE_KEY);
     }
   } catch (_) {
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(LEGACY_STORAGE_KEY);
   }
+}
+
+function migrateState(saved) {
+  const completedQuests = Array.isArray(saved.completedQuests) ? saved.completedQuests : [];
+  const sessions = Array.isArray(saved.sessions) ? saved.sessions : [];
+
+  if (saved.schemaVersion === STATE_VERSION) {
+    return {
+      ...state,
+      ...saved,
+      schemaVersion: STATE_VERSION,
+      quest: { ...state.quest, ...(saved.quest || {}) },
+      completedQuests,
+      currentSession: saved.currentSession || null,
+      sessions
+    };
+  }
+
+  if (!completedQuests.length) {
+    return {
+      ...state,
+      ...saved,
+      schemaVersion: STATE_VERSION,
+      quest: { ...state.quest, ...(saved.quest || {}) },
+      completedQuests: [],
+      currentSession: null,
+      sessions: []
+    };
+  }
+
+  const legacySessionId = `legacy-${Date.now()}`;
+  const migratedQuests = completedQuests.map((quest) => ({
+    ...quest,
+    sessionId: quest.sessionId || legacySessionId
+  }));
+  const completionDates = migratedQuests.map((quest) => quest.completedAt).filter(Boolean).sort();
+
+  return {
+    ...state,
+    ...saved,
+    schemaVersion: STATE_VERSION,
+    quest: { ...state.quest, ...(saved.quest || {}) },
+    completedQuests: migratedQuests,
+    currentSession: null,
+    sessions: [{
+      id: legacySessionId,
+      targetRuns: Math.max(migratedQuests.length, Number(saved.progress) || 0, 1),
+      status: 'completed',
+      startedAt: null,
+      completedAt: completionDates[completionDates.length - 1] || new Date().toISOString(),
+      runIds: migratedQuests.map((quest) => quest.id)
+    }]
+  };
+}
+
+function createSession(targetRuns = 5) {
+  return {
+    id: `session-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    targetRuns,
+    status: 'active',
+    startedAt: new Date().toISOString(),
+    completedAt: null,
+    runIds: []
+  };
+}
+
+function ensureCurrentSession() {
+  if (!state.currentSession) state.currentSession = createSession();
+  return state.currentSession;
 }
 
 function saveState() {
@@ -153,13 +227,17 @@ document.addEventListener('click', (event) => {
     pauseTimer();
     state.progress = Math.min(5, state.progress + 1);
     state.currentReward = rewards[Math.floor(Math.random() * rewards.length)];
-    state.completedQuests.push({
+    const session = ensureCurrentSession();
+    const completedQuest = {
       id: `${Date.now()}`,
       ...state.quest,
       elapsedSeconds: state.elapsedSeconds,
       completedAt: new Date().toISOString(),
-      reward: state.currentReward
-    });
+      reward: state.currentReward,
+      sessionId: session.id
+    };
+    state.completedQuests.push(completedQuest);
+    session.runIds.push(completedQuest.id);
     fillQuest(); updateProgress(); saveState(); show('success');
   }
   if (action === 'new') {
