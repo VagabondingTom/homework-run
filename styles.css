@@ -34,7 +34,7 @@ h1 { max-width:620px; margin:0 0 12px; color:var(--ink); font:800 clamp(38px,9vw
 .intro,.encouragement { max-width:550px; color:var(--muted); line-height:1.55; }
 form { display:grid; gap:18px; margin-top:28px; }
 fieldset { min-width:0; margin:0; padding:0; border:0; }
-.run-goal-fieldset legend { margin-bottom:12px; color:var(--ink); font-weight:700; }
+.run-goal-fieldset legend { display:block; width:100%; margin:0; padding:0 0 16px; color:var(--ink); font-weight:700; }
 .run-goals { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
 .run-goals label { display:block; }
 .run-goals input { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
@@ -45,7 +45,7 @@ fieldset { min-width:0; margin:0; padding:0; border:0; }
 .round-context span { font:800 14px Barlow Condensed; letter-spacing:1.5px; }
 .round-context button { min-height:44px; border:0; color:var(--orange-dark); background:transparent; font:800 12px Barlow Condensed; letter-spacing:1px; cursor:pointer; }
 label { display:grid; gap:8px; color:var(--ink); font-weight:700; }
-label > span { justify-self:end; margin-top:-24px; color:var(--muted); font-size:11px; font-weight:400; text-transform:uppercase; }
+#quest-form > label > span { justify-self:end; margin-top:-24px; color:var(--muted); font-size:11px; font-weight:400; text-transform:uppercase; }
 input,select,textarea { width:100%; min-height:54px; border:2px solid var(--line); border-radius:7px; outline:0; color:var(--ink); background:var(--paper); padding:14px; box-shadow:0 3px 0 #d8cdbb; }
 textarea { resize:vertical; } input:focus,select:focus,textarea:focus { border-color:var(--blue); box-shadow:0 0 0 3px #18a9c728; }
 .error { display:none; color:#bc351d; font-size:12px; }.error.visible { display:block; }
